@@ -683,8 +683,154 @@
         grid-template-areas:
           "cal insights"
           "journal journal" !important;
+
+      /* --- PRINT: layout + margins --- */
+      @page { size: letter portrait; margin: 0.25in; }
+
+      /* Lock to desktop-like width then scale to fit */
+      :root{ --printScale: 0.68; --printBaseWidth: 1120px; }
+
+      .topbar,
+      .container{
+        width: var(--printBaseWidth) !important;
+        max-width: none !important;
+      }
+      .app{
+        transform: scale(var(--printScale)) !important;
+        transform-origin: top left !important;
+        width: var(--printBaseWidth) !important;
       }
 
+      /* Remove legacy placeholder print sheet */
+      #printSheet{
+        display:none !important;
+        visibility:hidden !important;
+        height:0 !important;
+        overflow:hidden !important;
+      }
+
+      /* Hide header title + subtitle in print */
+      .brand,
+      .brandTitle,
+      .brandSub,
+      .topbar .left h1,
+      .topbar .left .sub,
+      .topbar .left .tagline{
+        display:none !important;
+      }
+
+      /* Hide controls that don't belong on paper */
+      #printBtn,
+      .nav button,
+      .scrollHint,
+      .status{
+        display:none !important;
+      }
+
+      /* Ensure two-column desktop grid (avoid responsive stacking) */
+      .layout{
+        grid-template-columns: minmax(0, 1fr) 360px !important;
+        grid-template-areas:
+          "cal insights"
+          "journal journal" !important;
+        gap: 12px !important;
+      }
+
+      /* --- Make calendar grid clearly discernable --- */
+      .calendarCard{
+        border-color: rgba(0,0,0,.35) !important;
+      }
+      .dow{
+        color:#111 !important;
+        border-bottom: 1px solid rgba(0,0,0,.35) !important;
+      }
+      .grid{ background:#fff !important; }
+      .day{
+        border-right: 1px solid rgba(0,0,0,.35) !important;
+        border-bottom: 1px solid rgba(0,0,0,.35) !important;
+        background: #fff !important;
+      }
+      .dayNum{ color:#111 !important; }
+      .dayNum.muted{ color:#666 !important; }
+
+      /* Multiday bars/pills readable on white paper */
+      .bar,
+      .pill,
+      .chip,
+      .badge{
+        background: #f2f2f2 !important;
+        color:#111 !important;
+        border:1px solid rgba(0,0,0,.25) !important;
+        box-shadow:none !important;
+      }
+
+      /* Panels / insights visible outlines */
+      .panel,
+      .insightsCard,
+      .calendarCard,
+      .journalCard,
+      .upcomingItem{
+        box-shadow:none !important;
+        background:#fff !important;
+        border-color: rgba(0,0,0,.25) !important;
+      }
+      .panelTitle,
+      .panel h3,
+      .panel h4{ color:#111 !important; }
+      .muted,
+      .meta,
+      .hint,
+      .small{ color:#444 !important; }
+
+      /* Don't clip content */
+      .panelBody,
+      .upcomingList{
+        overflow: visible !important;
+        max-height: none !important;
+      }
+
+      /* --- Journal section: print only month entries list (editor hidden) --- */
+      .journalCard textarea,
+      .journalCard .actions,
+      .journalCard .tip,
+      .journalCard .selectedDayHeader{
+        display:none !important;
+      }
+      #printMonthJournal{
+        display:block !important;
+        border-top: 1px solid rgba(0,0,0,.25) !important;
+        padding-top: 10px !important;
+        margin-top: 10px !important;
+      }
+      #printMonthJournal h2{
+        margin: 0 0 6px !important;
+        font-size: 14px !important;
+        letter-spacing: .06em !important;
+        text-transform: uppercase !important;
+        color:#111 !important;
+      }
+      #printMonthJournal .entry{
+        border: 1px solid rgba(0,0,0,.18) !important;
+        border-radius: 10px !important;
+        padding: 8px 10px !important;
+        margin: 0 0 8px !important;
+        white-space: pre-wrap !important;
+        color:#111 !important;
+        background:#fff !important;
+      }
+      #printMonthJournal .date{
+        font-weight: 800 !important;
+        margin-bottom: 4px !important;
+      }
+      #printMonthJournal .empty{
+        display:block !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+      }
+
+    }
       /* Print scaling: preserve on-screen positioning, then scale down to fit one portrait page.
          Adjust --printScale if you want it larger/smaller (0.60–0.78 is typical). */
       :root{ --printScale: 0.70; --printBaseWidth: 1180px; }
@@ -926,6 +1072,8 @@
 
             <div class="journalRight">
               <textarea id="journalText" placeholder="Write a journal entry… (saved locally)"></textarea>
+
+        <div id=\"printMonthJournal\" aria-hidden=\"true\"></div>
               <div class="btnRow">
                 <button id="saveBtn" class="btn" type="button">Save</button>
                 <button id="clearBtn" class="btn" type="button">Clear</button>
@@ -1028,8 +1176,67 @@ clearBtn.addEventListener("click", () => {
 });
 
 
+
+function buildPrintMonthJournal(){
+  const host = document.getElementById("printMonthJournal");
+  if(!host) return;
+
+  let y = (typeof shownYear !== "undefined") ? shownYear : null;
+  let m = (typeof shownMonthIndex !== "undefined") ? shownMonthIndex : null; // 0-based
+
+  if(y == null || m == null){
+    const label = document.querySelector(".monthLabel")?.textContent?.trim() || "";
+    const parts = label.split(/\s+/);
+    if(parts.length >= 2){
+      const monthName = parts[0].toLowerCase();
+      const yearNum = parseInt(parts[1], 10);
+      const months = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+      const mi = months.indexOf(monthName);
+      if(mi >= 0 && !Number.isNaN(yearNum)){ m = mi; y = yearNum; }
+    }
+  }
+
+  if(y == null || m == null){ host.innerHTML = ""; return; }
+
+  const prefix = "journal:";
+  const entries = [];
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(!k || !k.startsWith(prefix)) continue;
+    const d = k.slice(prefix.length);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) continue;
+    const yy = parseInt(d.slice(0,4),10);
+    const mm = parseInt(d.slice(5,7),10)-1;
+    if(yy !== y || mm !== m) continue;
+    const val = (localStorage.getItem(k) || "").trim();
+    if(!val) continue;
+    entries.push({date:d, text:val});
+  }
+  entries.sort((a,b)=>a.date.localeCompare(b.date));
+
+  if(entries.length === 0){
+    host.innerHTML = "<div class='empty'></div>";
+    return;
+  }
+
+  const monthLabel = document.querySelector(".monthLabel")?.textContent?.trim() || "";
+  host.innerHTML = "<h2>Journal entries — " + monthLabel + "</h2>" +
+    entries.map(e=>{
+      return "<div class='entry'><div class='date'>" + e.date + "</div><div class='text'>" +
+        escapeHtml(e.text) + "</div></div>";
+    }).join("");
+}
+
+function escapeHtml(str){
+  return (str ?? "").replace(/[&<>"']/g, (c) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[c]));
+}
+
 function prepareForPrint(){
-  // Add a class so you can target additional print overrides if needed.
+  
+  try{ buildPrintMonthJournal(); }catch(e){}
+// Add a class so you can target additional print overrides if needed.
   document.documentElement.classList.add("is-printing");
   document.body.classList.add("is-printing");
 
