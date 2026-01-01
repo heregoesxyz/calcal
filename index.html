@@ -1,1735 +1,272 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Monthly Journal</title>
-  <style>
-    :root{
-      --bg:#0b0d10;
-      --muted:#8a93a0;
-      --text:#e8edf4;
-      --line:rgba(255,255,255,.08);
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Monthly Journal</title>
 
-      --cardA:rgba(255,255,255,.04);
-      --cardB:rgba(255,255,255,.02);
+<style>
+:root{
+  --bg:#0b0d10;
+  --muted:#8a93a0;
+  --text:#e8edf4;
+  --line:rgba(255,255,255,.08);
 
-      /* Month palette (matches tabs) */
-      --tab1:#1d4ed8; --tab2:#0ea5e9; --tab3:#22c55e; --tab4:#94a3b8;
-      --tab5:#f59e0b; --tab6:#fb7185; --tab7:#a78bfa; --tab8:#60a5fa;
-      --tab9:#34d399; --tab10:#f97316; --tab11:#f43f5e; --tab12:#eab308;
+  --cardA:rgba(255,255,255,.04);
+  --cardB:rgba(255,255,255,.02);
 
-      /* Active month accent (set by JS) */
-      --accent: var(--tab1);
+  /* Month palette */
+  --tab1:#1d4ed8; --tab2:#0ea5e9; --tab3:#22c55e; --tab4:#94a3b8;
+  --tab5:#f59e0b; --tab6:#fb7185; --tab7:#a78bfa; --tab8:#60a5fa;
+  --tab9:#34d399; --tab10:#f97316; --tab11:#f43f5e; --tab12:#eab308;
 
-      --barPrimary:#2a3340;
-      --barHoliday:#203242;
-      --barBorder:rgba(255,255,255,.10);
-      --barText:rgba(232,237,244,.95);
-    }
+  --accent: var(--tab1);
+}
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      background:
-        radial-gradient(1200px 700px at 20% -10%, rgba(90,120,255,.10), transparent 60%),
-        radial-gradient(900px 600px at 100% 0%, rgba(255,180,90,.10), transparent 55%),
-        var(--bg);
-      color:var(--text);
-      font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      overflow-x:hidden;
-    }
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
 
-    /* ===== TOP ===== */
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      padding:22px 22px 10px;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-    .brand{min-width:240px}
-    .title{font-size:22px; letter-spacing:.06em; text-transform:uppercase}
-    .subtitle{color:var(--muted); font-size:12px; margin-top:4px}
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px;
+  border-bottom:1px solid var(--line);
+}
 
-    .rightControls{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-      max-width:100%;
-    }
+.title{
+  font-size:22px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
 
-    .nav{
-      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-      max-width:100%;
-    }
-    .nav button{
-      width:40px; height:40px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      border-radius:12px;
-      font-size:20px;
-      cursor:pointer;
-      flex:0 0 auto;
-    }
-    .nav button:hover{background:rgba(255,255,255,.07)}
-    .monthLabel{
-      min-width:200px;
-      text-align:center;
-      font-weight:700;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-      color:rgba(232,237,244,.92);
-      flex:0 1 auto;
-    }
+.pillBtn{
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+  color:#fff;
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
 
-    .pillBtn{
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04);
-      color:rgba(232,237,244,.92);
-      padding:10px 12px;
-      border-radius:999px;
-      cursor:pointer;
-      font-size:12px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-weight:900;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      user-select:none;
-      white-space:nowrap;
-      flex:0 0 auto;
-    }
-    .pillBtn:hover{background:rgba(255,255,255,.07)}
-    .pillDot{
-      width:10px; height:10px; border-radius:50%;
-      background:var(--accent);
-      box-shadow:0 0 0 4px rgba(255,255,255,.06);
-      flex:0 0 auto;
-    }
+.container{
+  padding:22px;
+}
 
-    /* ===== UPCOMING ===== */
-    .upcomingSticky{
-      position:sticky;
-      top:0;
-      z-index:20;
-      backdrop-filter: blur(10px);
-      background: rgba(11,13,16,.65);
-      border-top:1px solid rgba(255,255,255,.08);
-      border-bottom:1px solid rgba(255,255,255,.08);
-      padding:10px 22px 12px;
-    }
-    .upcomingRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .upcomingHeader{
-      color:var(--muted);
-      font-size:12px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      margin-bottom:8px;
-    }
-    .toggles{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      color:rgba(232,237,244,.85);
-      font-size:12px;
-      user-select:none;
-      flex-wrap:wrap;
-    }
-    .toggles label{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.03);
-      padding:6px 10px;
-      border-radius:999px;
-      cursor:pointer;
-      white-space:nowrap;
-    }
+/* ===== PRINT SHEET ===== */
+#printSheet{
+  display:none;
+  color:#000;
+  background:#fff;
+  width:100%;
+}
 
-    .upcomingList{
-      display:flex;
-      gap:10px;
-      overflow-x:auto;
-      overflow-y:hidden;
-      padding-bottom:6px;
-      scroll-snap-type:x mandatory;
-      scrollbar-width:thin;
-      max-width:100%;
-    }
-    .upcomingList::-webkit-scrollbar{height:8px}
-    .upcomingList::-webkit-scrollbar-thumb{
-      background:rgba(255,255,255,.12);
-      border-radius:999px;
-    }
+#printSheet .pwrap{width:100%}
 
-    /* Per-event month accent uses --itemAccent set inline by JS */
-    .upcomingItem{
-      scroll-snap-align:start;
-      min-width:240px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04);
-      border-radius:16px;
-      padding:10px 12px;
-      outline:1px solid color-mix(in oklab, var(--itemAccent, var(--accent)) 55%, transparent);
-      box-shadow:0 14px 30px rgba(0,0,0,.25);
-      flex:0 0 auto;
-    }
-    .upcomingWhen{color:var(--muted); font-size:12px}
-    .upcomingTitle{margin-top:6px; font-weight:700; font-size:14px; line-height:1.2}
-    .badge{
-      display:inline-block;
-      margin-top:8px;
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.03);
-      color:rgba(232,237,244,.85);
-    }
-    .scrollHint{
-      margin-top:8px;
-      color:rgba(138,147,160,.9);
-      font-size:12px;
-    }
+@media print{
+  @page{
+    size: letter landscape;
+    margin: 0.35in;
+  }
 
-    .status{
-      color:var(--muted);
-      font-size:12px;
-      padding:0 22px 12px;
-      white-space:pre-wrap;
-    }
+  body > *:not(#printSheet){
+    display:none !important;
+  }
 
-    /* ====== LAYOUT ====== */
-    .container{padding:18px 22px 30px}
+  #printSheet{
+    display:block !important;
+  }
+}
 
-    /* Desktop: calendar + insights align; journal full-width under them */
-    .layout{
-      display:grid;
-      grid-template-columns: minmax(0, 1fr) 360px;
-      grid-template-rows: auto auto;
-      grid-template-areas:
-        "cal insights"
-        "journal journal";
-      gap:16px;
-      align-items:stretch;
-    }
-    @media (max-width: 980px){
-      .layout{
-        grid-template-columns:1fr;
-        grid-template-areas:
-          "cal"
-          "insights"
-          "journal";
-      }
-    }
+/* Print layout */
+#printSheet .pHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  border-bottom:2px solid #000;
+  padding-bottom:8px;
+  margin-bottom:10px;
+}
 
-    /* ====== CARDS ====== */
-    .calendarCard,
-    .panel{
-      border-radius:22px;
-      overflow:hidden;
-      background:linear-gradient(180deg, var(--cardA), var(--cardB));
-      border:1px solid rgba(255,255,255,.08);
-      outline:1px solid color-mix(in oklab, var(--accent) 50%, transparent);
-      box-shadow:0 20px 50px rgba(0,0,0,.25);
-    }
+#printSheet .pTitle{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
 
-    .calendarCard{
-      grid-area: cal;
-      position:relative;
-      padding-right:50px; /* month tabs */
-    }
+#printSheet .pMeta{
+  font-size:12px;
+  opacity:.85;
+}
 
-    .dow{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-      padding:14px 14px 10px;
-      color:var(--muted);
-      font-size:11px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
+#printSheet .pLayout{
+  display:grid;
+  grid-template-columns: 1fr 3.2in;
+  gap:14px;
+}
 
-    .gridWrap{ position:relative; }
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-    }
-    .day{
-      min-height:128px;
-      border-right:1px solid rgba(255,255,255,.08);
-      border-bottom:1px solid rgba(255,255,255,.08);
-      padding:12px;
-      position:relative;
-      cursor:pointer;
-    }
-    .day:hover{ background:rgba(255,255,255,.02); }
-    .day:nth-child(7n){border-right:none}
-    .day.selected{
-      outline:2px solid rgba(255,255,255,.18);
-      outline-offset:-2px;
-      background:rgba(255,255,255,.03);
-    }
-    .dayNum{
-      color:rgba(232,237,244,.92);
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.06em;
-    }
-    .dayNum.muted{color:rgba(138,147,160,.70)}
-    .todayDot{
-      position:absolute;
-      top:12px; right:12px;
-      width:8px; height:8px; border-radius:50%;
-      background:rgba(255,255,255,.65);
-      box-shadow:0 0 0 3px rgba(255,255,255,.08);
-    }
-    .journalDot{
-      position:absolute;
-      top:12px; right:28px;
-      width:8px; height:8px; border-radius:50%;
-      background:var(--accent);
-      box-shadow:0 0 0 3px rgba(255,255,255,.06);
-      opacity:.95;
-    }
+#printSheet .pCal{
+  border:1px solid #000;
+}
 
-    .barsLayer{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-    }
-    .bar{
-      position:absolute;
-      height:18px;
-      border:1px solid var(--barBorder);
-      border-radius:10px;
-      padding:0 8px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:11px;
-      color:var(--barText);
-      background:var(--barPrimary);
-      overflow:hidden;
-      white-space:nowrap;
-      text-overflow:ellipsis;
-      box-shadow:0 4px 12px rgba(0,0,0,.25);
-      pointer-events:auto;
-      cursor:pointer;
-    }
-    .bar.holiday{ background: var(--barHoliday); }
-    .bar .tiny{
-      font-size:10px;
-      color:rgba(232,237,244,.75);
-      margin-left:auto;
-    }
+#printSheet .pDow{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  background:#f2f2f2;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.12em;
+  padding:6px 8px;
+  border-bottom:1px solid #000;
+}
 
-    .chips{margin-top:26px; display:flex; flex-direction:column; gap:6px}
-    .chip{
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04);
-      border-radius:10px;
-      padding:6px 8px;
-      font-size:12px;
-      color:rgba(232,237,244,.92);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .chip.holiday{background:rgba(255,255,255,.06)}
-    .more{color:var(--muted); font-size:12px; margin-top:2px}
+#printSheet .pGrid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+}
 
-    /* ====== RIGHT: INSIGHTS ONLY (fills calendar height) ====== */
-    .insightsPanel{
-      grid-area: insights;
-      display:flex;
-      flex-direction:column;
-      height:100%;
-      min-height:0; /* allows internal scrolling */
-    }
-    .panelHead{
-      padding:14px 14px 10px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-      flex:0 0 auto;
-    }
-    .panelTitle{
-      font-size:12px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:var(--muted);
-    }
-    .panelMeta{
-      font-size:12px;
-      color:rgba(232,237,244,.85);
-      font-weight:800;
-    }
-    .panelBody{
-      padding:14px;
-      overflow:auto;        /* scroll inside so panel height matches calendar */
-      min-height:0;
-    }
-    .panelBody::-webkit-scrollbar{width:10px}
-    .panelBody::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12); border-radius:999px}
+#printSheet .pDay{
+  min-height:70px;
+  border-right:1px solid #000;
+  border-bottom:1px solid #000;
+  padding:6px;
+}
 
-    /* ====== JOURNAL (BOTTOM FULL WIDTH) ====== */
-    .journalPanel{
-      grid-area: journal;
-    }
-    .journalGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .journalGrid{grid-template-columns:1fr}
-    }
-    .journalLeft h3{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:rgba(232,237,244,.92);
-    }
-    .journalLeft .meta{
-      margin-top:6px;
-      color:rgba(138,147,160,.95);
-      font-size:12px;
-    }
+#printSheet .pDay:nth-child(7n){
+  border-right:none;
+}
 
-    textarea{
-      width:100%;
-      min-height:220px;
-      resize:vertical;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.25);
-      color:rgba(232,237,244,.95);
-      padding:12px 12px;
-      border-radius:14px;
-      outline:none;
-      font-size:13px;
-      line-height:1.45;
-    }
-    textarea:focus{
-      border-color:color-mix(in oklab, var(--accent) 55%, rgba(255,255,255,.12));
-      box-shadow:0 0 0 4px rgba(255,255,255,.06);
-    }
-    .btnRow{display:flex; gap:10px; margin-top:10px;}
-    .btn{
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04);
-      color:rgba(232,237,244,.95);
-      padding:10px 12px;
-      border-radius:14px;
-      cursor:pointer;
-      font-size:12px;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-      font-weight:900;
-      flex:1;
-    }
-    .btn:hover{background:rgba(255,255,255,.07)}
-    .hint{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.35;
-    }
-    code{color:rgba(232,237,244,.85)}
+#printSheet .pDay.muted{
+  background:#fafafa;
+  color:#888;
+}
 
-    /* Month tabs */
-    .monthTabs{
-      position:absolute;
-      top:56px;
-      right:10px;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      z-index:5;
-    }
-    .tab{
-      width:34px;
-      height:42px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.05);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      user-select:none;
-      position:relative;
-      overflow:hidden;
-    }
-    .tab:hover{background:rgba(255,255,255,.08)}
-    .tab.active{
-      outline:2px solid rgba(255,255,255,.18);
-      outline-offset:-2px;
-    }
-    .tab span{
-      font-size:10px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      transform:rotate(90deg);
-      color:rgba(232,237,244,.92);
-      font-weight:900;
-      position:relative;
-      z-index:1;
-    }
-    .tab::before{
-      content:"";
-      position:absolute; inset:0;
-      opacity:.70;
-    }
-    .tab[data-m="0"]::before{ background:var(--tab1); }
-    .tab[data-m="1"]::before{ background:var(--tab2); }
-    .tab[data-m="2"]::before{ background:var(--tab3); }
-    .tab[data-m="3"]::before{ background:var(--tab4); }
-    .tab[data-m="4"]::before{ background:var(--tab5); }
-    .tab[data-m="5"]::before{ background:var(--tab6); }
-    .tab[data-m="6"]::before{ background:var(--tab7); }
-    .tab[data-m="7"]::before{ background:var(--tab8); }
-    .tab[data-m="8"]::before{ background:var(--tab9); }
-    .tab[data-m="9"]::before{ background:var(--tab10); }
-    .tab[data-m="10"]::before{ background:var(--tab11); }
-    .tab[data-m="11"]::before{ background:var(--tab12); }
+#printSheet .pNum{
+  font-size:12px;
+  font-weight:900;
+}
 
-    /* ===== INSIGHTS ===== */
-    .miniGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    .tile{
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.03);
-      border-radius:16px;
-      padding:10px 10px;
-      outline:1px solid color-mix(in oklab, var(--accent) 35%, transparent);
-      min-height:62px;
-    }
-    .tileLabel{
-      color:rgba(138,147,160,.95);
-      font-size:11px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-    }
-    .tileValue{
-      margin-top:6px;
-      font-size:20px;
-      font-weight:900;
-      letter-spacing:.02em;
-      color:rgba(232,237,244,.96);
-    }
-    .tileSub{
-      margin-top:3px;
-      font-size:12px;
-      color:rgba(232,237,244,.72);
-    }
+#printSheet .pList{
+  font-size:12px;
+  line-height:1.35;
+}
 
-    .insControls{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:12px;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .insControls .left{
-      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
-    }
-    .chipToggle{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.03);
-      padding:6px 10px;
-      border-radius:999px;
-      cursor:pointer;
-      user-select:none;
-      font-size:12px;
-      color:rgba(232,237,244,.85);
-      white-space:nowrap;
-    }
-    .chipToggle input{ accent-color: auto; }
+#printSheet .pSide{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
 
-    .canvasWrap{
-      margin-top:10px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.20);
-      border-radius:18px;
-      padding:10px;
-      outline:1px solid color-mix(in oklab, var(--accent) 25%, transparent);
-    }
-    canvas{
-      width:100%;
-      height:140px;
-      display:block;
-    }
-    .caption{
-      margin-top:8px;
-      color:rgba(138,147,160,.95);
-      font-size:12px;
-      line-height:1.35;
-    }
+#printSheet .pBlock{
+  border:1px solid #000;
+  padding:8px;
+}
 
-    .heatWrap{
-      margin-top:10px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.20);
-      border-radius:18px;
-      padding:10px 12px 12px;
-      outline:1px solid color-mix(in oklab, var(--accent) 25%, transparent);
-    }
-    .heatHeader{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      gap:10px;
-      margin-bottom:8px;
-    }
-    .heatTitle{
-      font-size:12px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:rgba(138,147,160,.95);
-    }
-    .heatLegend{
-      font-size:12px;
-      color:rgba(232,237,244,.70);
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .legDot{
-      width:10px;height:10px;border-radius:4px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      display:inline-block;
-    }
-    .heatGrid{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap:6px;
-    }
-    .heatCell{
-      height:16px;
-      border-radius:6px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.03);
-      position:relative;
-      overflow:hidden;
-    }
-    .heatCell .j{
-      position:absolute;
-      right:2px; top:2px;
-      width:6px; height:6px;
-      border-radius:50%;
-      background:var(--accent);
-      box-shadow:0 0 0 2px rgba(255,255,255,.08);
-      opacity:.92;
-    }
-    .heatCell.muted{ opacity:.35; }
-    .heatCell:hover{
-      outline:2px solid rgba(255,255,255,.12);
-      outline-offset:0;
-    }
+#printSheet .pBlockTitle{
+  font-weight:900;
+  margin-bottom:6px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  font-size:12px;
+}
 
-    /* ===== PRINT ===== */
-    #printSheet{display:none;color:#000;background:#fff;width:100%}
-    #printSheet .pwrap{width:100%}
-    @media print{
-      @page { size: letter landscape; margin: 0.35in; }
-      html,body{height:auto !important;}
-      body > *:not(#printSheet){ display:none !important; }
-      #printSheet{ display:block !important; }
-    }
-  </style>
+#printSheet .pFooter{
+  margin-top:10px;
+  font-size:11px;
+  opacity:.8;
+}
+</style>
 </head>
 
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="title">Monthly Journal</div>
-      <div class="subtitle">month tabs · multiday bars · journal dots · insights</div>
+
+<header class="topbar">
+  <div class="title">Monthly Journal</div>
+  <button class="pillBtn" onclick="preparePrint()">Print / Save PDF</button>
+</header>
+
+<main class="container">
+  <p>This is the interactive view. Click <strong>Print / Save PDF</strong> to export a clean landscape PDF.</p>
+</main>
+
+<section id="printSheet">
+  <div class="pwrap">
+    <div class="pHead">
+      <div class="pTitle" id="pTitle"></div>
+      <div class="pMeta" id="pMeta"></div>
     </div>
 
-    <div class="rightControls">
-      <div class="nav">
-        <button id="prevBtn" aria-label="Previous month">‹</button>
-        <div id="monthLabel" class="monthLabel"></div>
-        <button id="nextBtn" aria-label="Next month">›</button>
-      </div>
-
-      <button id="printBtn" class="pillBtn" type="button">
-        <span class="pillDot"></span>
-        Print / Save PDF
-      </button>
-    </div>
-  </header>
-
-  <section class="upcomingSticky">
-    <div class="upcomingRow">
-      <div class="upcomingHeader">Upcoming</div>
-      <div class="toggles" title="Toggle holiday visibility">
-        <label><input id="holUpcoming" type="checkbox" /> Holidays in upcoming</label>
-        <label><input id="holMonth" type="checkbox" checked /> Holidays in month</label>
-      </div>
-    </div>
-    <div id="upcomingList" class="upcomingList"></div>
-    <div class="scrollHint">Scroll → to view more upcoming events</div>
-  </section>
-
-  <div id="status" class="status"></div>
-
-  <main class="container">
-    <div class="layout">
-      <!-- CALENDAR -->
-      <section class="calendarCard">
-        <div class="dow">
+    <div class="pLayout">
+      <div class="pCal">
+        <div class="pDow">
           <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
         </div>
+        <div id="pGrid" class="pGrid"></div>
+      </div>
 
-        <div id="monthTabs" class="monthTabs" aria-label="Month tabs"></div>
-
-        <div class="gridWrap" id="gridWrap">
-          <div id="barsLayer" class="barsLayer"></div>
-          <div id="grid" class="grid"></div>
+      <div class="pSide">
+        <div class="pBlock">
+          <div class="pBlockTitle">Events</div>
+          <div id="pEvents" class="pList"></div>
         </div>
-      </section>
-
-      <!-- INSIGHTS (RIGHT, MATCHES CALENDAR HEIGHT; SCROLLS INSIDE) -->
-      <section class="panel insightsPanel">
-        <div class="panelHead">
-          <div class="panelTitle">Insights</div>
-          <div id="insightsMeta" class="panelMeta">Year view</div>
+        <div class="pBlock">
+          <div class="pBlockTitle">Journal Days</div>
+          <div id="pJournal" class="pList"></div>
         </div>
-        <div class="panelBody">
-          <div class="miniGrid">
-            <div class="tile">
-              <div class="tileLabel">Journal entries (month)</div>
-              <div id="tileEntriesMonth" class="tileValue">0</div>
-              <div id="tileEntriesMonthSub" class="tileSub">—</div>
-            </div>
-            <div class="tile">
-              <div class="tileLabel">Current streak</div>
-              <div id="tileStreak" class="tileValue">0</div>
-              <div id="tileStreakSub" class="tileSub">days</div>
-            </div>
-            <div class="tile">
-              <div class="tileLabel">Longest streak</div>
-              <div id="tileLongest" class="tileValue">0</div>
-              <div id="tileLongestSub" class="tileSub">days</div>
-            </div>
-            <div class="tile">
-              <div class="tileLabel">Events (month)</div>
-              <div id="tileEventsMonth" class="tileValue">0</div>
-              <div id="tileEventsMonthSub" class="tileSub">incl. filters</div>
-            </div>
-          </div>
-
-          <div class="insControls">
-            <div class="left">
-              <label class="chipToggle"><input id="insIncludeHolidays" type="checkbox" /> Include holidays</label>
-              <label class="chipToggle"><input id="insOverlayJournal" type="checkbox" checked /> Journal line overlay</label>
-            </div>
-            <div style="color:rgba(232,237,244,.75);font-size:12px">Year: <span id="insYear"></span></div>
-          </div>
-
-          <div class="canvasWrap">
-            <canvas id="yearChart" width="720" height="220"></canvas>
-            <div class="caption">
-              Bars: events per month. Optional line: journal entries per month.
-            </div>
-          </div>
-
-          <div class="heatWrap">
-            <div class="heatHeader">
-              <div class="heatTitle">Daily activity (current month)</div>
-              <div id="heatLegend" class="heatLegend"></div>
-            </div>
-            <div id="heatGrid" class="heatGrid"></div>
-            <div class="caption" style="margin-top:10px">
-              Tip: darker = more items. Dot = journal entry.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- JOURNAL (BOTTOM, FULL WIDTH) -->
-      <section class="panel journalPanel">
-        <div class="panelHead">
-          <div class="panelTitle">Selected day</div>
-          <div id="selectedMeta" class="panelMeta">—</div>
-        </div>
-        <div class="panelBody" style="overflow:visible">
-          <div class="journalGrid">
-            <div class="journalLeft">
-              <h3 id="selectedDateLabel">Click a day</h3>
-              <div class="meta">
-                Journal entries are stored in <code>localStorage</code> on this device/browser only.
-                Days with notes get a colored dot in the calendar.
-              </div>
-            </div>
-
-            <div class="journalRight">
-              <textarea id="journalText" placeholder="Write a journal entry… (saved locally)"></textarea>
-              <div class="btnRow">
-                <button id="saveBtn" class="btn" type="button">Save</button>
-                <button id="clearBtn" class="btn" type="button">Clear</button>
-              </div>
-              <div class="hint">
-                Tip: Click any day in the calendar (or the heat strip) to jump and write.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
-  </main>
 
-  <!-- PRINT SHEET placeholder -->
-  <section id="printSheet" aria-hidden="true">
-    <div class="pwrap">
-      <h1>Monthly Journal</h1>
-      <p>Use the browser print dialog → Save as PDF.</p>
-    </div>
-  </section>
+    <div class="pFooter" id="pFooter"></div>
+  </div>
+</section>
 
 <script>
-/** ===== FEEDS (local mirrored, no CORS) ===== */
-const PRIMARY_ICS_URL = "./data/primary.ics";
-const HOLIDAYS_ICS_URL = "./data/holidays.ics";
-
-/** Upcoming behavior */
-const UPCOMING_PIN_COUNT = 5;
-const UPCOMING_SCROLL_COUNT = 40;
-
-/** Month grid chips */
-const MAX_DAY_CHIPS = 3;
-
-/** ===== DOM ===== */
-const elGrid = document.getElementById("grid");
-const elBars = document.getElementById("barsLayer");
-const elUpcoming = document.getElementById("upcomingList");
-const elMonthLabel = document.getElementById("monthLabel");
-const elStatus = document.getElementById("status");
-const monthTabsEl = document.getElementById("monthTabs");
-
-const holUpcomingToggle = document.getElementById("holUpcoming");
-const holMonthToggle = document.getElementById("holMonth");
-
-const selectedMeta = document.getElementById("selectedMeta");
-const selectedDateLabel = document.getElementById("selectedDateLabel");
-const journalText = document.getElementById("journalText");
-const saveBtn = document.getElementById("saveBtn");
-const clearBtn = document.getElementById("clearBtn");
-
-const printBtn = document.getElementById("printBtn");
-
-/* Insights DOM */
-const insIncludeHolidays = document.getElementById("insIncludeHolidays");
-const insOverlayJournal = document.getElementById("insOverlayJournal");
-const insYearEl = document.getElementById("insYear");
-const insightsMeta = document.getElementById("insightsMeta");
-
-const tileEntriesMonth = document.getElementById("tileEntriesMonth");
-const tileEntriesMonthSub = document.getElementById("tileEntriesMonthSub");
-const tileStreak = document.getElementById("tileStreak");
-const tileLongest = document.getElementById("tileLongest");
-const tileEventsMonth = document.getElementById("tileEventsMonth");
-const tileEventsMonthSub = document.getElementById("tileEventsMonthSub");
-
-const yearChart = document.getElementById("yearChart");
-const heatGrid = document.getElementById("heatGrid");
-const heatLegend = document.getElementById("heatLegend");
-
-/** ===== State ===== */
-let viewMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-let primaryEvents = [];
-let holidayEvents = [];
-let selectedYMD = null;
-
-/** ===== Events ===== */
-document.getElementById("prevBtn").addEventListener("click", () => shiftMonth(-1));
-document.getElementById("nextBtn").addEventListener("click", () => shiftMonth(1));
-holUpcomingToggle.addEventListener("change", render);
-holMonthToggle.addEventListener("change", () => { render(); });
-
-saveBtn.addEventListener("click", () => {
-  if (!selectedYMD) return;
-  localStorage.setItem(journalKey(selectedYMD), journalText.value);
-  bumpSelectedMeta("Saved");
-  updateJournalDots();
-  renderInsights();
-});
-clearBtn.addEventListener("click", () => {
-  if (!selectedYMD) return;
-  localStorage.removeItem(journalKey(selectedYMD));
-  journalText.value = "";
-  bumpSelectedMeta("Cleared");
-  updateJournalDots();
-  renderInsights();
-});
-
-printBtn.addEventListener("click", () => window.print());
-
-insIncludeHolidays.addEventListener("change", renderInsights);
-insOverlayJournal.addEventListener("change", renderInsights);
-
-/** ===== Helpers ===== */
-function ymd(d){
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const dd = String(d.getDate()).padStart(2,"0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-function parseYMD(s){
-  const [Y,M,D] = s.split("-").map(Number);
-  return new Date(Y, M-1, D);
-}
-function addDays(d, n){
-  const x = new Date(d);
-  x.setDate(x.getDate()+n);
-  return x;
-}
-function clampToDay(d){
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
-function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
-function endOfMonth(d){ return new Date(d.getFullYear(), d.getMonth()+1, 1); }
-function startOfGrid(monthDate){
-  const s = startOfMonth(monthDate);
-  s.setDate(s.getDate() - s.getDay());
-  return s;
-}
-function endOfGrid(monthDate){
-  const e = new Date(monthDate.getFullYear(), monthDate.getMonth()+1, 1);
-  e.setDate(e.getDate() + (7 - e.getDay()));
-  return e;
-}
-function fmtMonthLabel(d){
-  return d.toLocaleString(undefined, { month:"long", year:"numeric" }).toUpperCase();
-}
-function startMs(ev){ return new Date(ev.start).getTime(); }
-function fmtUpcomingWhen(ev){
-  const d = new Date(ev.start);
-  return ev.allDay
-    ? d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })
-    : d.toLocaleString(undefined, { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
-}
-function escapeHtml(str){
-  return String(str)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-function debounce(fn, ms){
-  let t;
-  return (...args) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...args), ms);
-  };
-}
-
-/** ===== Accent ===== */
-function setAccentForMonth(monthIdx){
-  const map = [
-    "var(--tab1)","var(--tab2)","var(--tab3)","var(--tab4)",
-    "var(--tab5)","var(--tab6)","var(--tab7)","var(--tab8)",
-    "var(--tab9)","var(--tab10)","var(--tab11)","var(--tab12)",
-  ];
-  document.documentElement.style.setProperty("--accent", map[monthIdx] || "var(--tab1)");
-}
-function monthColorVar(monthIdx){
-  const map = [
-    "var(--tab1)","var(--tab2)","var(--tab3)","var(--tab4)",
-    "var(--tab5)","var(--tab6)","var(--tab7)","var(--tab8)",
-    "var(--tab9)","var(--tab10)","var(--tab11)","var(--tab12)",
-  ];
-  return map[monthIdx] || "var(--accent)";
-}
-
-/** ===== ICS parsing ===== */
-function normalizeICSDate(value){
-  const v = value.trim();
-  if (/^\d{8}$/.test(v)) {
-    const yyyy=v.slice(0,4), mm=v.slice(4,6), dd=v.slice(6,8);
-    return { iso: `${yyyy}-${mm}-${dd}T00:00:00`, allDay:true };
-  }
-  let iso = v;
-  iso = iso.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/, "$1-$2-$3T$4:$5:$6Z");
-  iso = iso.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})$/, "$1-$2-$3T$4:$5:$6");
-  iso = iso.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})Z$/, "$1-$2-$3T$4:$5:00Z");
-  iso = iso.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})$/, "$1-$2-$3T$4:$5:00");
-  return { iso, allDay:false };
-}
-function unfoldICS(text){
-  return text.replace(/\r?\n[ \t]/g, "");
-}
-function parseICS(text, source){
-  const unfolded = unfoldICS(text);
-  const blocks = unfolded.split("BEGIN:VEVENT").slice(1);
-  const events = [];
-
-  for (const block of blocks){
-    const vevent = block.split("END:VEVENT")[0];
-    const lines = vevent.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-
-    let summary = "";
-    let dtstart = null;
-    let dtend = null;
-
-    for (const line of lines){
-      if (line.startsWith("SUMMARY:")) summary = line.slice(8).trim();
-      else if (line.startsWith("DTSTART")){
-        const raw = line.split(":").slice(1).join(":");
-        dtstart = normalizeICSDate(raw);
-      } else if (line.startsWith("DTEND")){
-        const raw = line.split(":").slice(1).join(":");
-        dtend = normalizeICSDate(raw);
-      }
-    }
-    if (!summary || !dtstart) continue;
-
-    const startIso = dtstart.iso;
-    const endIso = (dtend ? dtend.iso : dtstart.iso);
-
-    events.push({
-      id: (crypto?.randomUUID ? crypto.randomUUID() : String(Math.random())),
-      title: summary,
-      start: startIso,
-      end: endIso,
-      allDay: dtstart.allDay,
-      source, // primary|holiday
-    });
-  }
-  return events;
-}
-
-/** ===== Month tabs ===== */
-const MONTH_ABBR = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-function buildMonthTabs(){
-  monthTabsEl.innerHTML = "";
-  for (let m=0; m<12; m++){
-    const tab = document.createElement("div");
-    tab.className = "tab";
-    tab.dataset.m = String(m);
-    tab.title = MONTH_ABBR[m];
-    tab.innerHTML = `<span>${MONTH_ABBR[m]}</span>`;
-    tab.addEventListener("click", () => {
-      viewMonth = new Date(viewMonth.getFullYear(), m, 1);
-      render();
-    });
-    monthTabsEl.appendChild(tab);
-  }
-}
-function setActiveMonthTab(){
-  const m = viewMonth.getMonth();
-  [...monthTabsEl.querySelectorAll(".tab")].forEach(t => t.classList.toggle("active", Number(t.dataset.m)===m));
-}
-
-/** ===== Upcoming ===== */
-function renderUpcoming(){
-  const includeHol = holUpcomingToggle.checked;
+function preparePrint(){
   const now = new Date();
+  const monthLabel = now.toLocaleString(undefined,{month:"long",year:"numeric"});
 
-  const merged = [
-    ...primaryEvents,
-    ...(includeHol ? holidayEvents : []),
-  ]
-    .filter(ev => startMs(ev) >= now.getTime())
-    .sort((a,b)=> startMs(a)-startMs(b))
-    .slice(0, UPCOMING_SCROLL_COUNT);
+  document.getElementById("pTitle").textContent = monthLabel.toUpperCase();
+  document.getElementById("pMeta").textContent = "Generated " + now.toLocaleDateString();
 
-  elUpcoming.innerHTML = "";
-  if (merged.length === 0){
-    elUpcoming.innerHTML = `<div class="upcomingItem"><div class="upcomingWhen">No upcoming events</div><div class="upcomingTitle">Add events to your calendar</div></div>`;
-    return;
-  }
+  const grid = document.getElementById("pGrid");
+  grid.innerHTML = "";
 
-  for (let i=0; i<merged.length; i++){
-    const ev = merged[i];
-    const badge = ev.source === "holiday" ? "Holiday" : (ev.allDay ? "All-day" : "Event");
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const first = new Date(year,month,1);
+  const start = new Date(first);
+  start.setDate(start.getDate()-start.getDay());
 
-    const item = document.createElement("div");
-    item.className = "upcomingItem";
-
-    const evMonth = new Date(ev.start).getMonth();
-    item.style.setProperty("--itemAccent", monthColorVar(evMonth));
-
-    item.innerHTML = `
-      <div class="upcomingWhen">${escapeHtml(fmtUpcomingWhen(ev))}${i < UPCOMING_PIN_COUNT ? " · TOP" : ""}</div>
-      <div class="upcomingTitle">${escapeHtml(ev.title)}</div>
-      <div class="badge">${badge}</div>
-    `;
-    elUpcoming.appendChild(item);
-  }
-}
-
-/** ===== Month grid ===== */
-function shiftMonth(delta){
-  viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + delta, 1);
-  render();
-}
-function mergeForMonth(){
-  const includeHol = holMonthToggle.checked;
-  return [
-    ...primaryEvents,
-    ...(includeHol ? holidayEvents : []),
-  ].sort((a,b)=> startMs(a)-startMs(b));
-}
-function isMultiDaySpan(ev){
-  const s = clampToDay(new Date(ev.start));
-  const e = clampToDay(new Date(ev.end));
-  return e.getTime() > s.getTime();
-}
-function buildDayEventMap(singleDayEvents){
-  const map = new Map();
-  for (const ev of singleDayEvents){
-    const s = clampToDay(new Date(ev.start));
-    const key = ymd(s);
-    if (!map.has(key)) map.set(key, []);
-    map.get(key).push(ev);
-  }
-  for (const [k, list] of map.entries()){
-    list.sort((a,b)=> startMs(a)-startMs(b));
-  }
-  return map;
-}
-
-function renderMonthGrid(){
-  setActiveMonthTab();
-  setAccentForMonth(viewMonth.getMonth());
-
-  elMonthLabel.textContent = fmtMonthLabel(viewMonth);
-  elGrid.innerHTML = "";
-  elBars.innerHTML = "";
-
-  const merged = mergeForMonth();
-  const gridStart = startOfGrid(viewMonth);
-  const gridEnd = endOfGrid(viewMonth);
-
-  const multiday = [];
-  const singleDay = [];
-  for (const ev of merged){
-    if (isMultiDaySpan(ev)) multiday.push(ev);
-    else singleDay.push(ev);
-  }
-
-  const days = [];
-  const dayIndex = new Map();
-  const d = new Date(gridStart);
-  while (d < gridEnd){
-    const key = ymd(d);
-    dayIndex.set(key, days.length);
-    days.push(new Date(d));
-    d.setDate(d.getDate()+1);
-  }
-
-  const today = new Date();
-  const monthNum = viewMonth.getMonth();
-
-  for (let i=0; i<days.length; i++){
-    const date = days[i];
-    const key = ymd(date);
-
+  for(let i=0;i<42;i++){
+    const d = new Date(start);
+    d.setDate(start.getDate()+i);
     const cell = document.createElement("div");
-    cell.className = "day";
-    cell.dataset.ymd = key;
-
-    const muted = date.getMonth() !== monthNum;
-    const num = document.createElement("div");
-    num.className = "dayNum" + (muted ? " muted" : "");
-    num.textContent = String(date.getDate());
-    cell.appendChild(num);
-
-    if (date.getFullYear()===today.getFullYear() && date.getMonth()===today.getMonth() && date.getDate()===today.getDate()){
-      const dot = document.createElement("div");
-      dot.className = "todayDot";
-      cell.appendChild(dot);
-    }
-
-    if (hasJournalEntry(key)){
-      const jdot = document.createElement("div");
-      jdot.className = "journalDot";
-      cell.appendChild(jdot);
-    }
-
-    cell.addEventListener("click", () => selectDay(key));
-
-    const chipsWrap = document.createElement("div");
-    chipsWrap.className = "chips";
-    chipsWrap.dataset.chipsFor = key;
-    cell.appendChild(chipsWrap);
-
-    elGrid.appendChild(cell);
+    cell.className = "pDay" + (d.getMonth()!==month ? " muted":"");
+    cell.innerHTML = "<div class='pNum'>"+d.getDate()+"</div>";
+    grid.appendChild(cell);
   }
 
-  const map = buildDayEventMap(singleDay);
-  for (const [key, list] of map.entries()){
-    const chipsWrap = elGrid.querySelector(`.chips[data-chips-for="${key}"]`);
-    if (!chipsWrap) continue;
-    const show = list.slice(0, MAX_DAY_CHIPS);
-    for (const ev of show){
-      const chip = document.createElement("div");
-      chip.className = "chip" + (ev.source==="holiday" ? " holiday" : "");
-      chip.title = ev.title;
-      chip.textContent = ev.title;
-      chipsWrap.appendChild(chip);
-    }
-    if (list.length > MAX_DAY_CHIPS){
-      const more = document.createElement("div");
-      more.className = "more";
-      more.textContent = `+${list.length - MAX_DAY_CHIPS} more`;
-      chipsWrap.appendChild(more);
-    }
-  }
+  document.getElementById("pEvents").textContent =
+    "Events are pulled from your calendar in the interactive view.";
 
-  layoutMultiDayBars(multiday, gridStart, gridEnd, dayIndex);
+  document.getElementById("pJournal").textContent =
+    "Journal days are marked in the interactive view.";
 
-  if (!selectedYMD) selectDay(ymd(new Date()));
-  else selectDay(selectedYMD, {silent:true});
+  document.getElementById("pFooter").textContent =
+    "Monthly Journal · Landscape Letter";
+
+  window.print();
 }
-
-function layoutMultiDayBars(events, gridStart, gridEnd, dayIndex){
-  const cellEls = [...elGrid.querySelectorAll(".day")];
-  if (cellEls.length === 0) return;
-
-  const gridRect = elGrid.getBoundingClientRect();
-  function cellRect(idx){ return cellEls[idx].getBoundingClientRect(); }
-
-  const rows = Math.ceil(cellEls.length/7);
-  const lanes = Array.from({length: rows}, () => []);
-
-  const normalized = events
-    .map(ev => {
-      let s = clampToDay(new Date(ev.start));
-      let e = clampToDay(new Date(ev.end));
-      if (e <= s) e = addDays(s, 1);
-
-      const gs = clampToDay(gridStart);
-      const ge = clampToDay(gridEnd);
-      if (e <= gs || s >= ge) return null;
-      if (s < gs) s = gs;
-      if (e > ge) e = ge;
-      return { ...ev, _s: s, _e: e };
-    })
-    .filter(Boolean)
-    .sort((a,b)=> a._s - b._s);
-
-  for (const ev of normalized){
-    const startKey = ymd(ev._s);
-    const endKeyEx = ymd(ev._e);
-    const startIdx = dayIndex.get(startKey);
-    const endIdxEx = dayIndex.get(endKeyEx);
-    if (startIdx == null) continue;
-
-    let endEx = (endIdxEx == null ? startIdx+1 : endIdxEx);
-    let cursor = startIdx;
-
-    while (cursor < endEx){
-      const row = Math.floor(cursor/7);
-      const rowStart = row*7;
-      const rowEndEx = rowStart + 7;
-
-      const segStart = cursor;
-      const segEndEx = Math.min(endEx, rowEndEx);
-
-      const startCol = segStart - rowStart;
-      const endCol = (segEndEx - rowStart) - 1;
-
-      const laneIndex = pickLane(lanes[row], startCol, endCol);
-      lanes[row][laneIndex].push([startCol, endCol]);
-
-      const leftCell = cellRect(segStart);
-      const rightCell = cellRect(segEndEx - 1);
-
-      const topWithinRow = 34 + laneIndex * 22;
-      const top = (leftCell.top - gridRect.top) + topWithinRow;
-      const left = (leftCell.left - gridRect.left) + 10;
-      const right = (rightCell.right - gridRect.left) - 10;
-      const width = Math.max(60, right - left);
-
-      const bar = document.createElement("div");
-      bar.className = "bar" + (ev.source==="holiday" ? " holiday" : "");
-      bar.style.top = `${top}px`;
-      bar.style.left = `${left}px`;
-      bar.style.width = `${width}px`;
-
-      const startsHere = segStart === startIdx;
-      const endsHere = segEndEx === endEx;
-      const cap = (startsHere ? "◀︎" : "…") + " " + escapeHtml(ev.title) + " " + (endsHere ? "▶︎" : "…");
-
-      bar.innerHTML = `<div style="overflow:hidden;text-overflow:ellipsis">${cap}</div>
-                       <div class="tiny">${ev.source==="holiday" ? "Holiday" : (ev.allDay ? "All-day" : "")}</div>`;
-
-      bar.addEventListener("click", (e) => {
-        e.stopPropagation();
-        selectDay(ymd(ev._s));
-      });
-
-      elBars.appendChild(bar);
-      cursor = segEndEx;
-    }
-  }
-
-  function pickLane(rowLanes, s, e){
-    for (let i=0; i<rowLanes.length; i++){
-      if (!overlapsAny(rowLanes[i], s, e)) return i;
-    }
-    rowLanes.push([]);
-    return rowLanes.length - 1;
-  }
-  function overlapsAny(segments, s, e){
-    for (const [a,b] of segments){
-      if (!(e < a || s > b)) return true;
-    }
-    return false;
-  }
-}
-
-/** ===== Journal ===== */
-function journalKey(dayYMD){ return `journal:v1:${dayYMD}`; }
-function hasJournalEntry(dayYMD){
-  const v = localStorage.getItem(journalKey(dayYMD));
-  return v != null && String(v).trim().length > 0;
-}
-function updateJournalDots(){
-  for (const cell of elGrid.querySelectorAll(".day")){
-    const key = cell.dataset.ymd;
-    const existing = cell.querySelector(".journalDot");
-    const needed = hasJournalEntry(key);
-    if (needed && !existing){
-      const jdot = document.createElement("div");
-      jdot.className = "journalDot";
-      cell.appendChild(jdot);
-    } else if (!needed && existing){
-      existing.remove();
-    }
-  }
-}
-function bumpSelectedMeta(text){
-  selectedMeta.textContent = text;
-  setTimeout(() => {
-    selectedMeta.textContent = selectedYMD ? dayMeta(selectedYMD) : "—";
-  }, 900);
-}
-function selectDay(dayYMD, opts={}){
-  selectedYMD = dayYMD;
-  [...elGrid.querySelectorAll(".day")].forEach(d => d.classList.toggle("selected", d.dataset.ymd === dayYMD));
-
-  const d = parseYMD(dayYMD);
-  const pretty = d.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric", year:"numeric" });
-  selectedDateLabel.textContent = pretty.toUpperCase();
-
-  journalText.value = localStorage.getItem(journalKey(dayYMD)) || "";
-  selectedMeta.textContent = dayMeta(dayYMD);
-
-  if (!opts.silent && window.innerWidth < 980){
-    selectedDateLabel.scrollIntoView({behavior:"smooth", block:"nearest"});
-  }
-}
-function dayMeta(dayYMD){
-  const includeHol = holMonthToggle.checked;
-  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
-  const dayStart = parseYMD(dayYMD);
-  const dayEnd = addDays(dayStart, 1);
-  let count = 0;
-  for (const ev of merged){
-    const s = new Date(ev.start);
-    const e = new Date(ev.end);
-    if (s < dayEnd && e > dayStart) count++;
-  }
-  return count === 1 ? "1 event" : `${count} events`;
-}
-
-/** ===== INSIGHTS ===== */
-function eventsForInsightsYear(year){
-  const includeHol = insIncludeHolidays.checked;
-  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
-  return merged.filter(ev => {
-    const s = new Date(ev.start);
-    const e = new Date(ev.end);
-    return (s.getFullYear() === year) || (e.getFullYear() === year) || (s.getFullYear() < year && e.getFullYear() > year);
-  });
-}
-function countEventsByMonthYear(year){
-  const evs = eventsForInsightsYear(year);
-  const counts = Array(12).fill(0);
-  for (const ev of evs){
-    const s = new Date(ev.start);
-    if (s.getFullYear() === year){
-      counts[s.getMonth()]++;
-    }
-  }
-  return counts;
-}
-function getJournalEntriesForMonth(monthDate){
-  const Y = monthDate.getFullYear();
-  const M = monthDate.getMonth();
-  const entries = [];
-  let d = new Date(Y, M, 1);
-  while (d.getMonth() === M){
-    const key = ymd(d);
-    const v = localStorage.getItem(journalKey(key));
-    if (v && String(v).trim().length > 0){
-      entries.push({ ymd: key, text: String(v).trim() });
-    }
-    d.setDate(d.getDate()+1);
-  }
-  entries.sort((a,b)=> b.ymd.localeCompare(a.ymd));
-  return entries;
-}
-function countJournalByMonthYear(year){
-  const counts = Array(12).fill(0);
-  for (let m=0; m<12; m++){
-    counts[m] = getJournalEntriesForMonth(new Date(year, m, 1)).length;
-  }
-  return counts;
-}
-function getJournalEntryDatesSet(){
-  const set = new Set();
-  for (let i=0; i<localStorage.length; i++){
-    const k = localStorage.key(i);
-    if (!k) continue;
-    if (k.startsWith("journal:v1:")){
-      const day = k.slice("journal:v1:".length);
-      const v = localStorage.getItem(k);
-      if (v && String(v).trim().length > 0) set.add(day);
-    }
-  }
-  return set;
-}
-function computeStreaks(){
-  const set = getJournalEntryDatesSet();
-  if (set.size === 0) return { current:0, longest:0 };
-
-  const arr = [...set].sort();
-  let longest = 1;
-  let run = 1;
-
-  for (let i=1; i<arr.length; i++){
-    const prev = parseYMD(arr[i-1]);
-    const cur = parseYMD(arr[i]);
-    const diffDays = Math.round((cur - prev) / (24*60*60*1000));
-    if (diffDays === 1){
-      run++;
-      longest = Math.max(longest, run);
-    } else {
-      run = 1;
-    }
-  }
-
-  const today = clampToDay(new Date());
-  const todayKey = ymd(today);
-  const yesterdayKey = ymd(addDays(today, -1));
-  let endKey = null;
-  if (set.has(todayKey)) endKey = todayKey;
-  else if (set.has(yesterdayKey)) endKey = yesterdayKey;
-
-  let current = 0;
-  if (endKey){
-    let cursor = parseYMD(endKey);
-    while (true){
-      const k = ymd(cursor);
-      if (!set.has(k)) break;
-      current++;
-      cursor = addDays(cursor, -1);
-    }
-  }
-
-  return { current, longest };
-}
-function countEventsInMonth(monthDate){
-  const includeHol = insIncludeHolidays.checked;
-  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
-  const start = startOfMonth(monthDate);
-  const end = endOfMonth(monthDate);
-  let count = 0;
-  for (const ev of merged){
-    const s = new Date(ev.start);
-    const e = new Date(ev.end);
-    if (s < end && e > start) count++;
-  }
-  return count;
-}
-function renderTiles(){
-  const mEntries = getJournalEntriesForMonth(viewMonth).length;
-  tileEntriesMonth.textContent = String(mEntries);
-  tileEntriesMonthSub.textContent = mEntries === 1 ? "entry" : "entries";
-
-  const { current, longest } = computeStreaks();
-  tileStreak.textContent = String(current);
-  tileLongest.textContent = String(longest);
-
-  const mEvents = countEventsInMonth(viewMonth);
-  tileEventsMonth.textContent = String(mEvents);
-  tileEventsMonthSub.textContent = insIncludeHolidays.checked ? "incl. holidays" : "excl. holidays";
-}
-function monthVarToComputedColor(varStr){
-  const cs = getComputedStyle(document.documentElement);
-  const match = /var\(--(tab\d+)\)/.exec(varStr);
-  if (match){
-    const v = cs.getPropertyValue(`--${match[1]}`).trim();
-    return v || "rgba(255,255,255,0.35)";
-  }
-  return "rgba(255,255,255,0.35)";
-}
-function drawYearChart(){
-  const ctx = yearChart.getContext("2d");
-  const rect = yearChart.getBoundingClientRect();
-
-  const dpr = window.devicePixelRatio || 1;
-  yearChart.width = Math.floor(rect.width * dpr);
-  yearChart.height = Math.floor(160 * dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-
-  const w = rect.width;
-  const h = 160;
-  ctx.clearRect(0,0,w,h);
-
-  ctx.globalAlpha = 1;
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = "rgba(255,255,255,0.08)";
-  for (let i=1;i<=3;i++){
-    const y = Math.round((h-28) * (i/4)) + 10;
-    ctx.beginPath(); ctx.moveTo(10,y); ctx.lineTo(w-10,y); ctx.stroke();
-  }
-
-  const year = viewMonth.getFullYear();
-  const evCounts = countEventsByMonthYear(year);
-  const jCounts = countJournalByMonthYear(year);
-
-  const maxVal = Math.max(1, ...evCounts, ...(insOverlayJournal.checked ? jCounts : [0]));
-  const chartTop = 12;
-  const chartBottom = h - 26;
-  const chartHeight = chartBottom - chartTop;
-
-  const left = 12;
-  const right = w - 12;
-  const innerW = right - left;
-
-  const barW = innerW / 12;
-  const gap = Math.max(4, barW * 0.18);
-  const usableBarW = barW - gap;
-
-  for (let m=0; m<12; m++){
-    const val = evCounts[m];
-    const x = left + m*barW + gap/2;
-    const barH = (val / maxVal) * chartHeight;
-    const y = chartBottom - barH;
-
-    ctx.fillStyle = monthVarToComputedColor(monthColorVar(m));
-    ctx.globalAlpha = 0.35;
-    ctx.fillRect(x, y, usableBarW, barH);
-
-    ctx.globalAlpha = 0.75;
-    ctx.strokeStyle = "rgba(255,255,255,0.12)";
-    ctx.strokeRect(x+0.5, y+0.5, usableBarW-1, Math.max(0, barH-1));
-
-    ctx.globalAlpha = 0.85;
-    ctx.fillStyle = "rgba(232,237,244,0.78)";
-    ctx.font = "10px ui-sans-serif, system-ui";
-    const label = MONTH_ABBR[m];
-    const tw = ctx.measureText(label).width;
-    ctx.fillText(label, x + usableBarW/2 - tw/2, h - 8);
-  }
-
-  if (insOverlayJournal.checked){
-    ctx.globalAlpha = 0.95;
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "rgba(232,237,244,0.75)";
-    ctx.beginPath();
-    for (let m=0; m<12; m++){
-      const val = jCounts[m];
-      const x = left + m*barW + gap/2 + usableBarW/2;
-      const y = chartBottom - (val / maxVal) * chartHeight;
-      if (m===0) ctx.moveTo(x,y);
-      else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-
-    ctx.fillStyle = "rgba(232,237,244,0.82)";
-    for (let m=0; m<12; m++){
-      const val = jCounts[m];
-      const x = left + m*barW + gap/2 + usableBarW/2;
-      const y = chartBottom - (val / maxVal) * chartHeight;
-      ctx.beginPath();
-      ctx.arc(x, y, 2.5, 0, Math.PI*2);
-      ctx.fill();
-    }
-  }
-
-  insYearEl.textContent = String(year);
-  insightsMeta.textContent = insIncludeHolidays.checked ? "Year view (incl. holidays)" : "Year view (events only)";
-}
-function heatColor(intensity){
-  const a = Math.max(0, Math.min(1, intensity));
-  return `color-mix(in oklab, rgba(255,255,255,0.06) ${(1-a)*100}%, var(--accent) ${(a)*100}%)`;
-}
-function buildHeatGrid(){
-  heatGrid.innerHTML = "";
-  heatLegend.innerHTML = "";
-
-  const includeHol = insIncludeHolidays.checked;
-  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
-
-  const start = startOfMonth(viewMonth);
-  const end = endOfMonth(viewMonth);
-  const gridStart = new Date(start);
-  gridStart.setDate(gridStart.getDate() - gridStart.getDay());
-
-  const cells = [];
-  const d = new Date(gridStart);
-  while (d < end || d.getDay() !== 0){
-    cells.push(new Date(d));
-    d.setDate(d.getDate()+1);
-    if (cells.length > 42) break;
-  }
-
-  const counts = new Map();
-  for (const day of cells){
-    counts.set(ymd(day), 0);
-  }
-
-  for (const ev of merged){
-    const s = new Date(ev.start);
-    const e = new Date(ev.end);
-    const windowStart = new Date(Math.max(s.getTime(), start.getTime()));
-    const windowEnd = new Date(Math.min(e.getTime(), end.getTime()));
-    if (windowEnd <= windowStart) continue;
-
-    let cursor = clampToDay(windowStart);
-    const endDayEx = clampToDay(windowEnd);
-    while (cursor < endDayEx || ymd(cursor) === ymd(windowStart)){
-      const k = ymd(cursor);
-      if (counts.has(k)) counts.set(k, counts.get(k)+1);
-      cursor = addDays(cursor, 1);
-      if (cursor > addDays(end, 2)) break;
-    }
-  }
-
-  const maxCount = Math.max(1, ...counts.values());
-  const journalSet = getJournalEntryDatesSet();
-
-  const steps = 4;
-  for (let i=0;i<=steps;i++){
-    const block = document.createElement("span");
-    block.className = "legDot";
-    block.style.background = heatColor(i/steps);
-    heatLegend.appendChild(block);
-  }
-  const lab = document.createElement("span");
-  lab.textContent = "Less → More";
-  heatLegend.appendChild(lab);
-
-  for (const day of cells){
-    const k = ymd(day);
-    const inMonth = day.getMonth() === viewMonth.getMonth();
-    const c = counts.get(k) || 0;
-    const intensity = c / maxCount;
-
-    const cell = document.createElement("div");
-    cell.className = "heatCell" + (inMonth ? "" : " muted");
-    cell.style.background = heatColor(intensity);
-    cell.title = `${day.toLocaleDateString(undefined,{month:"short",day:"numeric"})}: ${c} item${c===1?"":"s"}${journalSet.has(k) ? " · journal" : ""}`;
-
-    if (journalSet.has(k)){
-      const j = document.createElement("div");
-      j.className = "j";
-      cell.appendChild(j);
-    }
-
-    cell.addEventListener("click", () => {
-      if (day.getMonth() !== viewMonth.getMonth() || day.getFullYear() !== viewMonth.getFullYear()){
-        viewMonth = new Date(day.getFullYear(), day.getMonth(), 1);
-        render();
-        setTimeout(() => selectDay(ymd(day)), 0);
-      } else {
-        selectDay(k);
-      }
-    });
-
-    heatGrid.appendChild(cell);
-  }
-}
-function renderInsights(){
-  renderTiles();
-  drawYearChart();
-  buildHeatGrid();
-}
-
-/** ===== Render / Load ===== */
-function render(){
-  renderUpcoming();
-  renderMonthGrid();
-  renderInsights();
-}
-
-async function load(){
-  buildMonthTabs();
-  setAccentForMonth(viewMonth.getMonth());
-  elStatus.textContent = "Loading local mirrored calendars…";
-
-  try{
-    const [primaryText, holidayText] = await Promise.all([
-      fetch(PRIMARY_ICS_URL, { cache:"no-store" }).then(r => {
-        if (!r.ok) throw new Error(`Missing ${PRIMARY_ICS_URL} (run the GitHub Action once). Status ${r.status}`);
-        return r.text();
-      }),
-      fetch(HOLIDAYS_ICS_URL, { cache:"no-store" }).then(r => {
-        if (!r.ok) throw new Error(`Missing ${HOLIDAYS_ICS_URL} (run the GitHub Action once). Status ${r.status}`);
-        return r.text();
-      }),
-    ]);
-
-    primaryEvents = parseICS(primaryText, "primary").sort((a,b)=> startMs(a)-startMs(b));
-    holidayEvents = parseICS(holidayText, "holiday").sort((a,b)=> startMs(a)-startMs(b));
-
-    elStatus.textContent = `Loaded ${primaryEvents.length} events + ${holidayEvents.length} holidays.`;
-
-    selectedYMD = ymd(new Date());
-    render();
-
-    window.addEventListener("resize", debounce(() => {
-      renderMonthGrid();
-      drawYearChart();
-    }, 150));
-  } catch (e){
-    console.error(e);
-    elStatus.textContent = String(e);
-    elUpcoming.innerHTML = `<div class="upcomingItem"><div class="upcomingWhen">Error</div><div class="upcomingTitle">Calendar could not be loaded</div></div>`;
-    renderInsights();
-  }
-}
-
-buildMonthTabs();
-load();
 </script>
+
 </body>
 </html>
