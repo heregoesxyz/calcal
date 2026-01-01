@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dark Monthly Planner</title>
+  <title>Monthly Journal</title>
   <style>
     :root{
       --bg:#0b0d10;
@@ -14,18 +14,9 @@
       --cardA:rgba(255,255,255,.04);
       --cardB:rgba(255,255,255,.02);
 
-      --tab1:#1d4ed8; /* Jan */
-      --tab2:#0ea5e9; /* Feb */
-      --tab3:#22c55e; /* Mar */
-      --tab4:#94a3b8; /* Apr */
-      --tab5:#f59e0b; /* May */
-      --tab6:#fb7185; /* Jun */
-      --tab7:#a78bfa; /* Jul */
-      --tab8:#60a5fa; /* Aug */
-      --tab9:#34d399; /* Sep */
-      --tab10:#f97316;/* Oct */
-      --tab11:#f43f5e;/* Nov */
-      --tab12:#eab308;/* Dec */
+      --tab1:#1d4ed8; --tab2:#0ea5e9; --tab3:#22c55e; --tab4:#94a3b8;
+      --tab5:#f59e0b; --tab6:#fb7185; --tab7:#a78bfa; --tab8:#60a5fa;
+      --tab9:#34d399; --tab10:#f97316; --tab11:#f43f5e; --tab12:#eab308;
 
       --barPrimary:#2a3340;
       --barHoliday:#203242;
@@ -152,9 +143,9 @@
       color:var(--muted);
       font-size:12px;
       padding:0 22px 12px;
+      white-space:pre-wrap;
     }
 
-    /* ====== LAYOUT: calendar + right rail (tabs + journal) ====== */
     .container{padding:18px 22px 30px}
     .layout{
       display:grid;
@@ -172,7 +163,7 @@
       border-radius:22px;
       overflow:hidden;
       position:relative;
-      padding-right:50px; /* space for month tabs overlay */
+      padding-right:50px;
     }
 
     .dow{
@@ -186,10 +177,7 @@
       border-bottom:1px solid var(--line);
     }
 
-    /* ====== GRID ====== */
-    .gridWrap{
-      position:relative;
-    }
+    .gridWrap{ position:relative; }
     .grid{
       display:grid;
       grid-template-columns:repeat(7,1fr);
@@ -202,9 +190,7 @@
       position:relative;
       cursor:pointer;
     }
-    .day:hover{
-      background:rgba(255,255,255,.02);
-    }
+    .day:hover{ background:rgba(255,255,255,.02); }
     .day:nth-child(7n){border-right:none}
     .day.selected{
       outline:2px solid rgba(255,255,255,.18);
@@ -226,7 +212,6 @@
       box-shadow:0 0 0 3px rgba(255,255,255,.08);
     }
 
-    /* Multiday bars overlay layer */
     .barsLayer{
       position:absolute;
       inset:0;
@@ -248,7 +233,7 @@
       white-space:nowrap;
       text-overflow:ellipsis;
       box-shadow:0 4px 12px rgba(0,0,0,.25);
-      pointer-events:auto; /* allow click */
+      pointer-events:auto;
       cursor:pointer;
     }
     .bar.holiday{ background: var(--barHoliday); }
@@ -258,7 +243,7 @@
       margin-left:auto;
     }
 
-    .chips{margin-top:26px; display:flex; flex-direction:column; gap:6px} /* leave space for bars */
+    .chips{margin-top:26px; display:flex; flex-direction:column; gap:6px}
     .chip{
       border:1px solid var(--line);
       background:rgba(255,255,255,.04);
@@ -273,10 +258,9 @@
     .chip.holiday{background:rgba(255,255,255,.06)}
     .more{color:var(--muted); font-size:12px; margin-top:2px}
 
-    /* ====== RIGHT RAIL ====== */
     .rail{
       position:sticky;
-      top:86px; /* below topbar */
+      top:86px;
       display:flex;
       flex-direction:column;
       gap:14px;
@@ -284,7 +268,6 @@
     @media (max-width: 980px){
       .rail{position:relative; top:auto;}
     }
-
     .panel{
       border:1px solid var(--line);
       background:linear-gradient(180deg, var(--cardA), var(--cardB));
@@ -312,7 +295,6 @@
     }
     .panelBody{padding:14px}
 
-    /* Month tabs (right edge overlay on calendar) */
     .monthTabs{
       position:absolute;
       top:56px;
@@ -348,6 +330,8 @@
       transform:rotate(90deg);
       color:rgba(232,237,244,.92);
       font-weight:700;
+      position:relative;
+      z-index:1;
     }
     .tab::before{
       content:"";
@@ -366,14 +350,7 @@
     .tab[data-m="9"]::before{ background:var(--tab10); }
     .tab[data-m="10"]::before{ background:var(--tab11); }
     .tab[data-m="11"]::before{ background:var(--tab12); }
-    .tab span{ position:relative; z-index:1; }
 
-    /* Journal */
-    .journalDate{
-      font-weight:700;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-    }
     textarea{
       width:100%;
       min-height:160px;
@@ -416,6 +393,7 @@
       font-size:12px;
       line-height:1.35;
     }
+    code{color:rgba(232,237,244,.85)}
   </style>
 </head>
 
@@ -423,7 +401,7 @@
   <header class="topbar">
     <div class="brand">
       <div class="title">Monthly Journal</div>
-      <div class="subtitle">month tabs · multiday bars · journaling panel (localStorage)</div>
+      <div class="subtitle">GitHub Pages + GitHub Actions mirror (no CORS)</div>
     </div>
 
     <div class="nav">
@@ -436,7 +414,7 @@
   <section class="upcomingSticky">
     <div class="upcomingRow">
       <div class="upcomingHeader">Upcoming (next 5)</div>
-      <div class="toggles" title="Toggle holiday visibility">
+      <div class="toggles">
         <label><input id="holUpcoming" type="checkbox" checked /> Holidays in upcoming</label>
         <label><input id="holMonth" type="checkbox" checked /> Holidays in month</label>
       </div>
@@ -448,13 +426,11 @@
 
   <main class="container">
     <div class="layout">
-      <!-- CALENDAR -->
       <section class="calendarCard">
         <div class="dow">
           <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
         </div>
 
-        <!-- Month tabs (right edge) -->
         <div id="monthTabs" class="monthTabs" aria-label="Month tabs"></div>
 
         <div class="gridWrap" id="gridWrap">
@@ -463,7 +439,6 @@
         </div>
       </section>
 
-      <!-- RIGHT RAIL -->
       <aside class="rail">
         <section class="panel">
           <div class="panelHead">
@@ -471,7 +446,7 @@
             <div id="selectedMeta" class="panelMeta">—</div>
           </div>
           <div class="panelBody">
-            <div id="selectedDateLabel" class="journalDate">Click a day</div>
+            <div id="selectedDateLabel" style="font-weight:800;letter-spacing:.06em;text-transform:uppercase;">Click a day</div>
             <div style="height:10px"></div>
             <textarea id="journalText" placeholder="Write a quick journal entry… (saved locally)"></textarea>
             <div class="btnRow">
@@ -487,14 +462,13 @@
 
         <section class="panel">
           <div class="panelHead">
-            <div class="panelTitle">Tips</div>
-            <div class="panelMeta">UI</div>
+            <div class="panelTitle">Setup</div>
+            <div class="panelMeta">Repo</div>
           </div>
           <div class="panelBody">
             <div class="hint">
-              • Use the month tabs on the calendar's right edge to jump months.<br>
-              • Multi-day events draw as bars spanning across days/week rows.<br>
-              • Single-day timed/all-day events appear as chips inside day cells.
+              This page loads <code>./data/primary.ics</code> and <code>./data/holidays.ics</code> (same-origin).
+              A GitHub Action refreshes those daily. Run the Action once after you add it.
             </div>
           </div>
         </section>
@@ -503,30 +477,23 @@
   </main>
 
 <script>
-/** ======️ CONFIG ====== **/
-const PRIMARY_ICS_URL =
-  "https://calendar.google.com/calendar/ical/4b06862e65f8f6a412554b6923e1358e09f7ef660d834549dbf1bb9151dcb72d%40group.calendar.google.com/public/basic.ics";
-
-const US_HOLIDAYS_ICS_URL =
-  "https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics";
+/** ====== IMPORTANT ======
+ * This version loads local mirrored feeds:
+ *   /data/primary.ics
+ *   /data/holidays.ics
+ * Those are generated by the GitHub Action workflow.
+ */
+const PRIMARY_ICS_URL = "./data/primary.ics";
+const HOLIDAYS_ICS_URL = "./data/holidays.ics";
 
 const UPCOMING_COUNT = 5;
 const MAX_DAY_CHIPS = 3;
 
-// GitHub Pages often hits CORS on .ics. Use a proxy by default.
-// If direct fetch works for you, set USE_CORS_PROXY=false.
-const USE_CORS_PROXY = true;
-const CORS_PROXY = "https://cors.isomorphic-git.org/"; // prepends to URL
-/** ===================== **/
-
 const elGrid = document.getElementById("grid");
 const elBars = document.getElementById("barsLayer");
-const elGridWrap = document.getElementById("gridWrap");
-
 const elUpcoming = document.getElementById("upcomingList");
 const elMonthLabel = document.getElementById("monthLabel");
 const elStatus = document.getElementById("status");
-
 const monthTabsEl = document.getElementById("monthTabs");
 
 const holUpcomingToggle = document.getElementById("holUpcoming");
@@ -547,33 +514,9 @@ let viewMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let primaryEvents = [];
 let holidayEvents = [];
 
-// Selected day for journal
 let selectedYMD = null;
 
-saveBtn.addEventListener("click", () => {
-  if (!selectedYMD) return;
-  const key = journalKey(selectedYMD);
-  localStorage.setItem(key, journalText.value);
-  bumpSelectedMeta("Saved");
-});
-
-clearBtn.addEventListener("click", () => {
-  if (!selectedYMD) return;
-  const key = journalKey(selectedYMD);
-  localStorage.removeItem(key);
-  journalText.value = "";
-  bumpSelectedMeta("Cleared");
-});
-
-function bumpSelectedMeta(text){
-  selectedMeta.textContent = text;
-  setTimeout(() => {
-    // restore to event count if possible
-    selectedMeta.textContent = selectedYMD ? dayMeta(selectedYMD) : "—";
-  }, 900);
-}
-
-/** ====== DATE HELPERS ====== **/
+/** ====== DATE ====== **/
 function ymd(d){
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth()+1).padStart(2,"0");
@@ -585,15 +528,14 @@ function parseYMD(s){
   return new Date(Y, M-1, D);
 }
 function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
-function endOfMonth(d){ return new Date(d.getFullYear(), d.getMonth()+1, 0); }
 function startOfGrid(monthDate){
   const s = startOfMonth(monthDate);
-  s.setDate(s.getDate() - s.getDay()); // to Sunday
+  s.setDate(s.getDate() - s.getDay());
   return s;
 }
 function endOfGrid(monthDate){
   const e = new Date(monthDate.getFullYear(), monthDate.getMonth()+1, 1);
-  e.setDate(e.getDate() + (7 - e.getDay())); // end at next Sunday
+  e.setDate(e.getDate() + (7 - e.getDay()));
   return e;
 }
 function addDays(d, n){
@@ -607,13 +549,16 @@ function clampToDay(d){
 function fmtMonthLabel(d){
   return d.toLocaleString(undefined, { month:"long", year:"numeric" }).toUpperCase();
 }
-function safeFetchUrl(url){
-  return USE_CORS_PROXY ? (CORS_PROXY + url) : url;
+function startMs(ev){ return new Date(ev.start).getTime(); }
+function fmtUpcomingWhen(ev){
+  const d = new Date(ev.start);
+  return ev.allDay
+    ? d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })
+    : d.toLocaleString(undefined, { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
 }
 
-/** ====== ICS PARSING ====== **/
+/** ====== ICS ====== **/
 function normalizeICSDate(value){
-  // Supports DTSTART:20251231T170000Z, DTSTART;VALUE=DATE:20251231, DTSTART;TZID=...:20251231T090000
   const v = value.trim();
   if (/^\d{8}$/.test(v)) {
     const yyyy=v.slice(0,4), mm=v.slice(4,6), dd=v.slice(6,8);
@@ -654,33 +599,22 @@ function parseICS(text, source){
     }
     if (!summary || !dtstart) continue;
 
-    // If DTEND missing, assume same as start.
     const startIso = dtstart.iso;
-    let endIso = (dtend ? dtend.iso : dtstart.iso);
+    const endIso = (dtend ? dtend.iso : dtstart.iso);
 
-    // All-day events in ICS usually have DTEND = next day (exclusive).
-    // We'll keep that as-is and treat end as exclusive for multiday spanning.
     events.push({
       id: (crypto?.randomUUID ? crypto.randomUUID() : String(Math.random())),
       title: summary,
       start: startIso,
       end: endIso,
       allDay: dtstart.allDay,
-      source, // primary | holiday
+      source, // primary|holiday
     });
   }
   return events;
 }
 
-function startMs(ev){ return new Date(ev.start).getTime(); }
-function fmtUpcomingWhen(ev){
-  const d = new Date(ev.start);
-  return ev.allDay
-    ? d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })
-    : d.toLocaleString(undefined, { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
-}
-
-/** ====== UI: MONTH TABS ====== **/
+/** ====== MONTH TABS ====== **/
 const MONTH_ABBR = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 function buildMonthTabs(){
   monthTabsEl.innerHTML = "";
@@ -702,7 +636,7 @@ function setActiveMonthTab(){
   [...monthTabsEl.querySelectorAll(".tab")].forEach(t => t.classList.toggle("active", Number(t.dataset.m)===m));
 }
 
-/** ====== UPCOMING STRIP ====== **/
+/** ====== UPCOMING ====== **/
 function renderUpcoming(){
   const includeHol = holUpcomingToggle.checked;
   const now = new Date();
@@ -733,30 +667,25 @@ function renderUpcoming(){
   }
 }
 
-/** ====== MONTH GRID + MULTIDAY BARS ====== **/
+/** ====== GRID + MULTIDAY BARS ====== **/
 function shiftMonth(delta){
   viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + delta, 1);
   render();
 }
-
 function mergeForMonth(){
   const includeHol = holMonthToggle.checked;
-  const merged = [
+  return [
     ...primaryEvents,
     ...(includeHol ? holidayEvents : []),
   ].sort((a,b)=> startMs(a)-startMs(b));
-  return merged;
 }
-
 function isMultiDaySpan(ev){
-  // Treat as multi-day if end day is after start day (considering end as exclusive for all-day)
   const s = clampToDay(new Date(ev.start));
   const e = clampToDay(new Date(ev.end));
-  return e.getTime() > s.getTime() + 0; // different day
+  return e.getTime() > s.getTime();
 }
-
 function buildDayEventMap(singleDayEvents){
-  const map = new Map(); // ymd -> events
+  const map = new Map();
   for (const ev of singleDayEvents){
     const s = clampToDay(new Date(ev.start));
     const key = ymd(s);
@@ -780,9 +709,6 @@ function renderMonthGrid(){
   const gridStart = startOfGrid(viewMonth);
   const gridEnd = endOfGrid(viewMonth);
 
-  // Split events:
-  // - multiday: draw as bars spanning across the grid
-  // - single-day: draw as chips in cells
   const multiday = [];
   const singleDay = [];
   for (const ev of merged){
@@ -790,9 +716,8 @@ function renderMonthGrid(){
     else singleDay.push(ev);
   }
 
-  // Build day list + cell index map
   const days = [];
-  const dayIndex = new Map(); // ymd -> index
+  const dayIndex = new Map();
   const d = new Date(gridStart);
   while (d < gridEnd){
     const key = ymd(d);
@@ -801,9 +726,9 @@ function renderMonthGrid(){
     d.setDate(d.getDate()+1);
   }
 
-  // Render cells
   const today = new Date();
   const monthNum = viewMonth.getMonth();
+
   for (let i=0; i<days.length; i++){
     const date = days[i];
     const key = ymd(date);
@@ -826,7 +751,6 @@ function renderMonthGrid(){
 
     cell.addEventListener("click", () => selectDay(key));
 
-    // chips placeholder (filled later)
     const chipsWrap = document.createElement("div");
     chipsWrap.className = "chips";
     chipsWrap.dataset.chipsFor = key;
@@ -835,7 +759,7 @@ function renderMonthGrid(){
     elGrid.appendChild(cell);
   }
 
-  // Chips for single-day events
+  // chips for single-day
   const map = buildDayEventMap(singleDay);
   for (const [key, list] of map.entries()){
     const chipsWrap = elGrid.querySelector(`.chips[data-chips-for="${key}"]`);
@@ -856,64 +780,50 @@ function renderMonthGrid(){
     }
   }
 
-  // Bars for multi-day events (spanning across week rows)
   layoutMultiDayBars(multiday, gridStart, gridEnd, dayIndex);
-  // Keep selection highlight consistent after rerender
+
   if (!selectedYMD) selectDay(ymd(new Date()));
   else selectDay(selectedYMD, {silent:true});
 }
 
 function layoutMultiDayBars(events, gridStart, gridEnd, dayIndex){
-  // We position bars relative to the grid element
-  const gridRect = elGrid.getBoundingClientRect();
   const cellEls = [...elGrid.querySelectorAll(".day")];
+  if (cellEls.length === 0) return;
 
-  // compute cell geometry dynamically (responsive)
-  function cellRect(idx){
-    return cellEls[idx].getBoundingClientRect();
-  }
+  // Recompute rects after grid exists
+  const gridRect = elGrid.getBoundingClientRect();
+  function cellRect(idx){ return cellEls[idx].getBoundingClientRect(); }
 
-  // Build week rows: 0..N-1 each row has 7 days
   const totalCells = cellEls.length;
   const rows = Math.ceil(totalCells/7);
+  const lanes = Array.from({length: rows}, () => []);
 
-  // Track lanes per row to avoid overlaps
-  const lanes = Array.from({length: rows}, () => []); // each lane is array of occupied segments [startCol,endCol]
-
-  // Normalize each event to grid range (inclusive start, exclusive end for all-day)
   const normalized = events
     .map(ev => {
       let s = clampToDay(new Date(ev.start));
       let e = clampToDay(new Date(ev.end));
+      if (e <= s) e = addDays(s, 1);
 
-      // For non-all-day multi-day, treat end day inclusive-ish by bumping if same-day boundaries are odd
-      // We'll convert to exclusive end day for spanning:
-      if (e.getTime() <= s.getTime()) e = addDays(s, 1);
-
-      // Clamp to grid
       const gs = clampToDay(gridStart);
       const ge = clampToDay(gridEnd);
       if (e <= gs || s >= ge) return null;
-
       if (s < gs) s = gs;
       if (e > ge) e = ge;
-
       return { ...ev, _s: s, _e: e };
     })
     .filter(Boolean)
     .sort((a,b)=> a._s - b._s);
 
   for (const ev of normalized){
-    // Build spans across rows. We treat _e as exclusive end (day not included)
     const startKey = ymd(ev._s);
-    const endKeyExclusive = ymd(ev._e);
+    const endKeyEx = ymd(ev._e);
 
     const startIdx = dayIndex.get(startKey);
-    const endIdxEx = dayIndex.get(endKeyExclusive);
+    const endIdxEx = dayIndex.get(endKeyEx);
     if (startIdx == null) continue;
+
     let endEx = (endIdxEx == null ? startIdx+1 : endIdxEx);
 
-    // Walk row by row
     let cursor = startIdx;
     while (cursor < endEx){
       const row = Math.floor(cursor/7);
@@ -926,17 +836,13 @@ function layoutMultiDayBars(events, gridStart, gridEnd, dayIndex){
       const startCol = segStart - rowStart;
       const endCol = (segEndEx - rowStart) - 1;
 
-      // pick first lane in this row that doesn't overlap
       const laneIndex = pickLane(lanes[row], startCol, endCol);
-
-      // mark occupancy
       lanes[row][laneIndex].push([startCol, endCol]);
 
-      // Position bar using actual DOM cell rects
       const leftCell = cellRect(segStart);
       const rightCell = cellRect(segEndEx - 1);
 
-      const topWithinRow = 34 + laneIndex * 22; // inside cell area (below day number)
+      const topWithinRow = 34 + laneIndex * 22;
       const top = (leftCell.top - gridRect.top) + topWithinRow;
       const left = (leftCell.left - gridRect.left) + 10;
       const right = (rightCell.right - gridRect.left) - 10;
@@ -950,7 +856,6 @@ function layoutMultiDayBars(events, gridStart, gridEnd, dayIndex){
 
       const startsHere = segStart === startIdx;
       const endsHere = segEndEx === endEx;
-
       const cap = (startsHere ? "◀︎" : "…") + " " + escapeHtml(ev.title) + " " + (endsHere ? "▶︎" : "…");
 
       bar.innerHTML = `<div style="overflow:hidden;text-overflow:ellipsis">${cap}</div>
@@ -958,61 +863,64 @@ function layoutMultiDayBars(events, gridStart, gridEnd, dayIndex){
 
       bar.addEventListener("click", (e) => {
         e.stopPropagation();
-        // Select the start day of the event for journaling context
         selectDay(ymd(ev._s));
       });
 
       elBars.appendChild(bar);
-
       cursor = segEndEx;
     }
   }
 
-  function pickLane(rowLanes, startCol, endCol){
-    // rowLanes: array of lane arrays
+  function pickLane(rowLanes, s, e){
     for (let i=0; i<rowLanes.length; i++){
-      if (!overlapsAny(rowLanes[i], startCol, endCol)){
-        return i;
-      }
+      if (!overlapsAny(rowLanes[i], s, e)) return i;
     }
-    rowLanes.push([]); // new lane
+    rowLanes.push([]);
     return rowLanes.length - 1;
   }
-
   function overlapsAny(segments, s, e){
     for (const [a,b] of segments){
-      const overlap = !(e < a || s > b);
-      if (overlap) return true;
+      if (!(e < a || s > b)) return true;
     }
     return false;
   }
 }
 
-/** ====== JOURNAL (localStorage) ====== **/
-function journalKey(dayYMD){
-  return `journal:v1:${dayYMD}`;
+/** ====== JOURNAL ====== **/
+function journalKey(dayYMD){ return `journal:v1:${dayYMD}`; }
+
+saveBtn.addEventListener("click", () => {
+  if (!selectedYMD) return;
+  localStorage.setItem(journalKey(selectedYMD), journalText.value);
+  bumpSelectedMeta("Saved");
+});
+clearBtn.addEventListener("click", () => {
+  if (!selectedYMD) return;
+  localStorage.removeItem(journalKey(selectedYMD));
+  journalText.value = "";
+  bumpSelectedMeta("Cleared");
+});
+
+function bumpSelectedMeta(text){
+  selectedMeta.textContent = text;
+  setTimeout(() => {
+    selectedMeta.textContent = selectedYMD ? dayMeta(selectedYMD) : "—";
+  }, 900);
 }
+
 function selectDay(dayYMD, opts={}){
   selectedYMD = dayYMD;
-
-  // highlight cell
   [...elGrid.querySelectorAll(".day")].forEach(d => d.classList.toggle("selected", d.dataset.ymd === dayYMD));
 
   const d = parseYMD(dayYMD);
   const pretty = d.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric", year:"numeric" });
   selectedDateLabel.textContent = pretty.toUpperCase();
 
-  // load note
   journalText.value = localStorage.getItem(journalKey(dayYMD)) || "";
-
-  // meta: number of events that day (for month-merged)
   selectedMeta.textContent = dayMeta(dayYMD);
 
-  if (!opts.silent){
-    // If on small screens, scroll the journal into view after selection
-    if (window.innerWidth < 980){
-      selectedDateLabel.scrollIntoView({behavior:"smooth", block:"nearest"});
-    }
+  if (!opts.silent && window.innerWidth < 980){
+    selectedDateLabel.scrollIntoView({behavior:"smooth", block:"nearest"});
   }
 }
 
@@ -1022,8 +930,6 @@ function dayMeta(dayYMD){
     ...primaryEvents,
     ...(includeHol ? holidayEvents : []),
   ];
-
-  // Count events that start on this day OR multi-day spans that cover this day
   const dayStart = parseYMD(dayYMD);
   const dayEnd = addDays(dayStart, 1);
 
@@ -1031,15 +937,12 @@ function dayMeta(dayYMD){
   for (const ev of merged){
     const s = new Date(ev.start);
     const e = new Date(ev.end);
-
-    // treat all-day end as exclusive; timed end is as-given
-    const overlaps = (s < dayEnd) && (e > dayStart);
-    if (overlaps) count++;
+    if (s < dayEnd && e > dayStart) count++;
   }
   return count === 1 ? "1 event" : `${count} events`;
 }
 
-/** ====== RENDER ====== **/
+/** ====== MAIN ====== **/
 function render(){
   renderUpcoming();
   renderMonthGrid();
@@ -1054,19 +957,26 @@ function escapeHtml(str){
     .replaceAll("'","&#039;");
 }
 
-/** ====== LOAD DATA ====== **/
+function debounce(fn, ms){
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), ms);
+  };
+}
+
 async function load(){
   buildMonthTabs();
-  elStatus.textContent = "Loading calendars…";
+  elStatus.textContent = "Loading local mirrored calendars… (run GitHub Action once if empty)";
 
   try{
     const [primaryText, holidayText] = await Promise.all([
-      fetch(safeFetchUrl(PRIMARY_ICS_URL)).then(r => {
-        if (!r.ok) throw new Error("Primary calendar fetch failed");
+      fetch(PRIMARY_ICS_URL, { cache:"no-store" }).then(r => {
+        if (!r.ok) throw new Error(`Missing ${PRIMARY_ICS_URL} (run the GitHub Action once). Status ${r.status}`);
         return r.text();
       }),
-      fetch(safeFetchUrl(US_HOLIDAYS_ICS_URL)).then(r => {
-        if (!r.ok) throw new Error("Holiday calendar fetch failed");
+      fetch(HOLIDAYS_ICS_URL, { cache:"no-store" }).then(r => {
+        if (!r.ok) throw new Error(`Missing ${HOLIDAYS_ICS_URL} (run the GitHub Action once). Status ${r.status}`);
         return r.text();
       }),
     ]);
@@ -1076,31 +986,18 @@ async function load(){
 
     elStatus.textContent = `Loaded ${primaryEvents.length} events + ${holidayEvents.length} holidays.`;
 
-    // Default selected day: today
     selectedYMD = ymd(new Date());
     render();
 
-    // Re-layout bars on resize (since we use DOM rects)
     window.addEventListener("resize", debounce(() => {
-      // rerender month only (keeps selected)
       renderMonthGrid();
     }, 150));
 
   } catch (e){
     console.error(e);
-    elStatus.textContent =
-      "Could not load calendar data. If this is on GitHub Pages, it may be CORS. " +
-      "Leave USE_CORS_PROXY=true (default) or use a different proxy.";
+    elStatus.textContent = String(e);
     elUpcoming.innerHTML = `<div class="upcomingItem"><div class="upcomingWhen">Error</div><div class="upcomingTitle">Calendar could not be loaded</div></div>`;
   }
-}
-
-function debounce(fn, ms){
-  let t;
-  return (...args) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...args), ms);
-  };
 }
 
 load();
