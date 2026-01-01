@@ -662,7 +662,7 @@
     /* Goal: print exactly what you see on screen (no placeholder print sheet). */
     /* Tip: enable “Background graphics” in the browser print dialog if you want the gradients/colors. */
     @media print{
-      @page { size: letter landscape; margin: 0.35in; }
+      @page { size: letter portrait; margin: 0.35in; }
 
       html,body{
         height:auto !important;
@@ -678,9 +678,15 @@
       body{
         background: #ffffff !important;
         color:#000000 !important;
+        /* Scale down so the entire dashboard fits on a single Letter portrait page */
+        zoom: 0.72;
       }
 
-      /* Hide UI controls that don't belong on paper */
+
+            /* Never show the legacy placeholder print sheet */
+      #printSheet{ display:none !important; }
+
+/* Hide UI controls that don't belong on paper */
       #printBtn,
       .nav button,
       .scrollHint,
