@@ -225,7 +225,7 @@
       .layout{grid-template-columns:1fr}
     }
 
-    /* ====== CARDS (month-coded outline via --accent) ====== */
+    /* ====== CARDS ====== */
     .calendarCard,
     .panel{
       border-radius:22px;
@@ -286,7 +286,6 @@
       background:rgba(255,255,255,.65);
       box-shadow:0 0 0 3px rgba(255,255,255,.08);
     }
-    /* Journal indicator dot */
     .journalDot{
       position:absolute;
       top:12px; right:28px;
@@ -296,7 +295,6 @@
       opacity:.95;
     }
 
-    /* multiday layer */
     .barsLayer{
       position:absolute;
       inset:0;
@@ -449,11 +447,7 @@
       border-color:color-mix(in oklab, var(--accent) 55%, rgba(255,255,255,.12));
       box-shadow:0 0 0 4px rgba(255,255,255,.06);
     }
-    .btnRow{
-      display:flex;
-      gap:10px;
-      margin-top:10px;
-    }
+    .btnRow{display:flex; gap:10px; margin-top:10px;}
     .btn{
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.04);
@@ -476,119 +470,158 @@
     }
     code{color:rgba(232,237,244,.85)}
 
-    /* ===== PRINT (Save as PDF) =====
-       Fix: ensure sheet is sized to page and not off-screen.
-    */
-    #printSheet{
-      display:none;
-      color:#000;
-      background:#fff;
-      width:100%;
-      height:auto;
+    /* ===== INSIGHTS ===== */
+    .miniGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
     }
-    #printSheet .pwrap{
-      width:100%;
-      max-width:100%;
-      padding:0; /* @page margin handles it */
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    .tile{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      border-radius:16px;
+      padding:10px 10px;
+      outline:1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+      min-height:62px;
     }
-    #printSheet .pinner{
-      width:100%;
-      max-width:100%;
-      padding:0;
-    }
-
-    #printSheet h1{
-      margin:0 0 10px 0;
-      font-size:16px;
-      letter-spacing:.08em;
+    .tileLabel{
+      color:rgba(138,147,160,.95);
+      font-size:11px;
+      letter-spacing:.12em;
       text-transform:uppercase;
     }
-    #printSheet .pmeta{
+    .tileValue{
+      margin-top:6px;
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:.02em;
+      color:rgba(232,237,244,.96);
+    }
+    .tileSub{
+      margin-top:3px;
+      font-size:12px;
+      color:rgba(232,237,244,.72);
+    }
+
+    .insControls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .insControls .left{
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    }
+    .chipToggle{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      padding:6px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      font-size:12px;
+      color:rgba(232,237,244,.85);
+      white-space:nowrap;
+    }
+    .chipToggle input{ accent-color: auto; }
+
+    .canvasWrap{
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.20);
+      border-radius:18px;
+      padding:10px;
+      outline:1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+    }
+    canvas{
+      width:100%;
+      height:140px;
+      display:block;
+    }
+    .caption{
+      margin-top:8px;
+      color:rgba(138,147,160,.95);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .heatWrap{
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.20);
+      border-radius:18px;
+      padding:10px 12px 12px;
+      outline:1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+    }
+    .heatHeader{
       display:flex;
       justify-content:space-between;
-      gap:12px;
-      font-size:11px;
-      margin-bottom:10px;
-      flex-wrap:wrap;
-    }
-    #printSheet .pdow{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      margin-bottom:4px;
-      font-weight:800;
-      font-size:10px;
-      width:100%;
-    }
-    #printSheet .pgrid{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      border:1px solid #333;
-      font-size:10px;
-      width:100%;
-      max-width:100%;
-    }
-    #printSheet .pcell{
-      min-height:0.82in;
-      border-right:1px solid #333;
-      border-bottom:1px solid #333;
-      padding:6px;
-      overflow:hidden;
-    }
-    #printSheet .pcell:nth-child(7n){border-right:none}
-    #printSheet .pnum{font-weight:900; font-size:10px}
-    #printSheet .pevt{margin-top:4px; font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-
-    #printSheet .psectionRow{
-      display:grid;
-      grid-template-columns: 1.3fr 1fr;
-      gap:12px;
-      margin-top:10px;
-      align-items:start;
-      width:100%;
-      max-width:100%;
-    }
-    #printSheet .pbox{
-      border:1px solid #333;
-      padding:8px;
-      border-radius:8px;
-      width:100%;
-      max-width:100%;
-      overflow:hidden;
-    }
-    #printSheet .pbox h2{
-      margin:0 0 8px 0;
-      font-size:11px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-    #printSheet .pupItem{
-      font-size:10px;
-      margin-bottom:6px;
-    }
-    #printSheet .pupWhen{
-      font-weight:800;
-    }
-    #printSheet .pjItem{
-      font-size:10px;
+      align-items:baseline;
+      gap:10px;
       margin-bottom:8px;
     }
-    #printSheet .pjDate{
-      font-weight:900;
+    .heatTitle{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:rgba(138,147,160,.95);
     }
-    #printSheet .pjText{
-      margin-top:3px;
-      white-space:pre-wrap;
-      max-height:0.55in;
+    .heatLegend{
+      font-size:12px;
+      color:rgba(232,237,244,.70);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .legDot{
+      width:10px;height:10px;border-radius:4px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      display:inline-block;
+    }
+    .heatGrid{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:6px;
+    }
+    .heatCell{
+      height:16px;
+      border-radius:6px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      position:relative;
       overflow:hidden;
     }
+    .heatCell .j{
+      position:absolute;
+      right:2px; top:2px;
+      width:6px; height:6px;
+      border-radius:50%;
+      background:var(--accent);
+      box-shadow:0 0 0 2px rgba(255,255,255,.08);
+      opacity:.92;
+    }
+    .heatCell.muted{ opacity:.35; }
+    .heatCell:hover{
+      outline:2px solid rgba(255,255,255,.12);
+      outline-offset:0;
+    }
 
+    /* ===== PRINT ===== */
+    #printSheet{display:none;color:#000;background:#fff;width:100%}
+    #printSheet .pwrap{width:100%}
     @media print{
       @page { size: letter landscape; margin: 0.35in; }
       html,body{height:auto !important;}
       body > *:not(#printSheet){ display:none !important; }
       #printSheet{ display:block !important; }
-      #printSheet .pwrap{ display:block; }
     }
   </style>
 </head>
@@ -597,7 +630,7 @@
   <header class="topbar">
     <div class="brand">
       <div class="title">Monthly Journal</div>
-      <div class="subtitle">month tabs · multiday bars · journal dots · print-to-PDF</div>
+      <div class="subtitle">month tabs · multiday bars · journal dots · insights</div>
     </div>
 
     <div class="rightControls">
@@ -618,7 +651,6 @@
     <div class="upcomingRow">
       <div class="upcomingHeader">Upcoming</div>
       <div class="toggles" title="Toggle holiday visibility">
-        <!-- Default: NO holidays in upcoming -->
         <label><input id="holUpcoming" type="checkbox" /> Holidays in upcoming</label>
         <label><input id="holMonth" type="checkbox" checked /> Holidays in month</label>
       </div>
@@ -645,6 +677,7 @@
       </section>
 
       <aside class="rail">
+        <!-- Journal panel -->
         <section class="panel">
           <div class="panelHead">
             <div class="panelTitle">Selected day</div>
@@ -665,15 +698,64 @@
           </div>
         </section>
 
+        <!-- Insights panel -->
         <section class="panel">
           <div class="panelHead">
-            <div class="panelTitle">Setup</div>
-            <div class="panelMeta">No CORS</div>
+            <div class="panelTitle">Insights</div>
+            <div id="insightsMeta" class="panelMeta">Year view</div>
           </div>
           <div class="panelBody">
-            <div class="hint">
-              This page loads local mirrored feeds: <code>./data/primary.ics</code> and <code>./data/holidays.ics</code>.
-              A GitHub Action refreshes those (run it from your repo Actions tab when needed).
+            <!-- Tiles -->
+            <div class="miniGrid">
+              <div class="tile">
+                <div class="tileLabel">Journal entries (month)</div>
+                <div id="tileEntriesMonth" class="tileValue">0</div>
+                <div id="tileEntriesMonthSub" class="tileSub">—</div>
+              </div>
+              <div class="tile">
+                <div class="tileLabel">Current streak</div>
+                <div id="tileStreak" class="tileValue">0</div>
+                <div id="tileStreakSub" class="tileSub">days</div>
+              </div>
+              <div class="tile">
+                <div class="tileLabel">Longest streak</div>
+                <div id="tileLongest" class="tileValue">0</div>
+                <div id="tileLongestSub" class="tileSub">days</div>
+              </div>
+              <div class="tile">
+                <div class="tileLabel">Events (month)</div>
+                <div id="tileEventsMonth" class="tileValue">0</div>
+                <div id="tileEventsMonthSub" class="tileSub">incl. filters</div>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="insControls">
+              <div class="left">
+                <label class="chipToggle"><input id="insIncludeHolidays" type="checkbox" /> Include holidays</label>
+                <label class="chipToggle"><input id="insOverlayJournal" type="checkbox" checked /> Journal line overlay</label>
+              </div>
+              <div style="color:rgba(232,237,244,.75);font-size:12px">Year: <span id="insYear"></span></div>
+            </div>
+
+            <!-- Events per month chart -->
+            <div class="canvasWrap">
+              <canvas id="yearChart" width="720" height="220"></canvas>
+              <div class="caption">
+                Bars: events per month. Optional line: journal entries per month. Works even if your calendar is mostly empty.
+              </div>
+            </div>
+
+            <!-- Heat strip -->
+            <div class="heatWrap">
+              <div class="heatHeader">
+                <div class="heatTitle">Daily activity (current month)</div>
+                <div id="heatLegend" class="heatLegend"></div>
+              </div>
+              <div id="heatGrid" class="heatGrid"></div>
+              <div id="heatTip" class="caption" style="margin-top:10px">
+                Tip: darker = more items. Dot = journal entry.
+              </div>
             </div>
           </div>
         </section>
@@ -681,53 +763,25 @@
     </div>
   </main>
 
-  <!-- PRINT SHEET -->
+  <!-- PRINT SHEET placeholder (you can extend later) -->
   <section id="printSheet" aria-hidden="true">
     <div class="pwrap">
-      <div class="pinner">
-        <h1 id="pTitle">Monthly Journal</h1>
-        <div class="pmeta">
-          <div id="pMonth"></div>
-          <div id="pGenerated"></div>
-        </div>
-
-        <div class="pdow">
-          <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
-        </div>
-        <div id="pGrid" class="pgrid"></div>
-
-        <div class="psectionRow">
-          <div class="pbox">
-            <h2>Upcoming</h2>
-            <div id="pUpcoming"></div>
-          </div>
-          <div class="pbox">
-            <h2>Journal entries</h2>
-            <div id="pJournal"></div>
-          </div>
-        </div>
-      </div>
+      <h1>Monthly Journal</h1>
+      <p>Use the browser print dialog → Save as PDF.</p>
     </div>
   </section>
 
 <script>
-/** ====== IMPORTANT ======
- * Loads local mirrored feeds generated by the GitHub Action:
- *   /data/primary.ics
- *   /data/holidays.ics
- */
+/** ===== FEEDS (local mirrored, no CORS) ===== */
 const PRIMARY_ICS_URL = "./data/primary.ics";
 const HOLIDAYS_ICS_URL = "./data/holidays.ics";
 
 /** Upcoming behavior */
-const UPCOMING_PIN_COUNT = 5;          // first 5 are marked TOP
-const UPCOMING_SCROLL_COUNT = 40;      // render more so horizontal scroll goes further out
+const UPCOMING_PIN_COUNT = 5;
+const UPCOMING_SCROLL_COUNT = 40;
 
 /** Month grid chips */
 const MAX_DAY_CHIPS = 3;
-
-/** Journal print */
-const PRINT_JOURNAL_MAX = 6;
 
 /** ===== DOM ===== */
 const elGrid = document.getElementById("grid");
@@ -748,11 +802,22 @@ const clearBtn = document.getElementById("clearBtn");
 
 const printBtn = document.getElementById("printBtn");
 
-const pMonth = document.getElementById("pMonth");
-const pGenerated = document.getElementById("pGenerated");
-const pGrid = document.getElementById("pGrid");
-const pUpcoming = document.getElementById("pUpcoming");
-const pJournal = document.getElementById("pJournal");
+/* Insights DOM */
+const insIncludeHolidays = document.getElementById("insIncludeHolidays");
+const insOverlayJournal = document.getElementById("insOverlayJournal");
+const insYearEl = document.getElementById("insYear");
+const insightsMeta = document.getElementById("insightsMeta");
+
+const tileEntriesMonth = document.getElementById("tileEntriesMonth");
+const tileEntriesMonthSub = document.getElementById("tileEntriesMonthSub");
+const tileStreak = document.getElementById("tileStreak");
+const tileLongest = document.getElementById("tileLongest");
+const tileEventsMonth = document.getElementById("tileEventsMonth");
+const tileEventsMonthSub = document.getElementById("tileEventsMonthSub");
+
+const yearChart = document.getElementById("yearChart");
+const heatGrid = document.getElementById("heatGrid");
+const heatLegend = document.getElementById("heatLegend");
 
 /** ===== State ===== */
 let viewMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -764,28 +829,28 @@ let selectedYMD = null;
 document.getElementById("prevBtn").addEventListener("click", () => shiftMonth(-1));
 document.getElementById("nextBtn").addEventListener("click", () => shiftMonth(1));
 holUpcomingToggle.addEventListener("change", render);
-holMonthToggle.addEventListener("change", render);
+holMonthToggle.addEventListener("change", () => { render(); });
 
 saveBtn.addEventListener("click", () => {
   if (!selectedYMD) return;
   localStorage.setItem(journalKey(selectedYMD), journalText.value);
   bumpSelectedMeta("Saved");
   updateJournalDots();
+  renderInsights();
 });
-
 clearBtn.addEventListener("click", () => {
   if (!selectedYMD) return;
   localStorage.removeItem(journalKey(selectedYMD));
   journalText.value = "";
   bumpSelectedMeta("Cleared");
   updateJournalDots();
+  renderInsights();
 });
 
-printBtn.addEventListener("click", async () => {
-  buildPrintSheet();
-  await new Promise(r => setTimeout(r, 30));
-  window.print();
-});
+printBtn.addEventListener("click", () => window.print());
+
+insIncludeHolidays.addEventListener("change", renderInsights);
+insOverlayJournal.addEventListener("change", renderInsights);
 
 /** ===== Helpers ===== */
 function ymd(d){
@@ -807,6 +872,7 @@ function clampToDay(d){
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
+function endOfMonth(d){ return new Date(d.getFullYear(), d.getMonth()+1, 1); }
 function startOfGrid(monthDate){
   const s = startOfMonth(monthDate);
   s.setDate(s.getDate() - s.getDay());
@@ -843,7 +909,7 @@ function debounce(fn, ms){
   };
 }
 
-/** ===== Accent (current month) ===== */
+/** ===== Accent ===== */
 function setAccentForMonth(monthIdx){
   const map = [
     "var(--tab1)","var(--tab2)","var(--tab3)","var(--tab4)",
@@ -852,8 +918,6 @@ function setAccentForMonth(monthIdx){
   ];
   document.documentElement.style.setProperty("--accent", map[monthIdx] || "var(--tab1)");
 }
-
-/** Month color (used for upcoming card outlines per event month) */
 function monthColorVar(monthIdx){
   const map = [
     "var(--tab1)","var(--tab2)","var(--tab3)","var(--tab4)",
@@ -942,7 +1006,7 @@ function setActiveMonthTab(){
   [...monthTabsEl.querySelectorAll(".tab")].forEach(t => t.classList.toggle("active", Number(t.dataset.m)===m));
 }
 
-/** ===== Upcoming (scrollable, no holidays by default) ===== */
+/** ===== Upcoming ===== */
 function renderUpcoming(){
   const includeHol = holUpcomingToggle.checked;
   const now = new Date();
@@ -963,15 +1027,11 @@ function renderUpcoming(){
 
   for (let i=0; i<merged.length; i++){
     const ev = merged[i];
-
-    const badge =
-      ev.source === "holiday" ? "Holiday" :
-      ev.allDay ? "All-day" : "Event";
+    const badge = ev.source === "holiday" ? "Holiday" : (ev.allDay ? "All-day" : "Event");
 
     const item = document.createElement("div");
     item.className = "upcomingItem";
 
-    // ✅ Month-coded outline based on the event’s start month
     const evMonth = new Date(ev.start).getMonth();
     item.style.setProperty("--itemAccent", monthColorVar(evMonth));
 
@@ -984,7 +1044,7 @@ function renderUpcoming(){
   }
 }
 
-/** ===== Month grid + multiday bars ===== */
+/** ===== Month grid ===== */
 function shiftMonth(delta){
   viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + delta, 1);
   render();
@@ -1234,7 +1294,6 @@ function bumpSelectedMeta(text){
 }
 function selectDay(dayYMD, opts={}){
   selectedYMD = dayYMD;
-
   [...elGrid.querySelectorAll(".day")].forEach(d => d.classList.toggle("selected", d.dataset.ymd === dayYMD));
 
   const d = parseYMD(dayYMD);
@@ -1250,13 +1309,9 @@ function selectDay(dayYMD, opts={}){
 }
 function dayMeta(dayYMD){
   const includeHol = holMonthToggle.checked;
-  const merged = [
-    ...primaryEvents,
-    ...(includeHol ? holidayEvents : []),
-  ];
+  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
   const dayStart = parseYMD(dayYMD);
   const dayEnd = addDays(dayStart, 1);
-
   let count = 0;
   for (const ev of merged){
     const s = new Date(ev.start);
@@ -1266,109 +1321,51 @@ function dayMeta(dayYMD){
   return count === 1 ? "1 event" : `${count} events`;
 }
 
-/** ===== Print ===== */
-function buildPrintSheet(){
-  pMonth.textContent = fmtMonthLabel(viewMonth);
-  pGenerated.textContent = `Generated: ${new Date().toLocaleString()}`;
+/** ===== INSIGHTS: tiles + year bars + journal line + month heat ===== */
 
-  pGrid.innerHTML = "";
-
-  const includeHolMonth = holMonthToggle.checked;
-  const merged = [
-    ...primaryEvents,
-    ...(includeHolMonth ? holidayEvents : []),
-  ].sort((a,b)=> startMs(a)-startMs(b));
-
-  const gridStart = startOfGrid(viewMonth);
-  const gridEnd = endOfGrid(viewMonth);
-
-  const map = new Map();
-  for (const ev of merged){
-    const s = clampToDay(new Date(ev.start));
+function eventsForInsightsYear(year){
+  const includeHol = insIncludeHolidays.checked;
+  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
+  // Only events that touch that year at all
+  return merged.filter(ev => {
+    const s = new Date(ev.start);
     const e = new Date(ev.end);
-    if (e <= gridStart || s >= gridEnd) continue;
+    return (s.getFullYear() === year) || (e.getFullYear() === year) || (s.getFullYear() < year && e.getFullYear() > year);
+  });
+}
 
-    const key = ymd(s);
-    if (!map.has(key)) map.set(key, []);
-    map.get(key).push(ev);
-  }
-  for (const [k, list] of map.entries()){
-    list.sort((a,b)=> startMs(a)-startMs(b));
-  }
-
-  const monthNum = viewMonth.getMonth();
-  let d = new Date(gridStart);
-  while (d < gridEnd){
-    const key = ymd(d);
-    const muted = d.getMonth() !== monthNum;
-
-    const cell = document.createElement("div");
-    cell.className = "pcell";
-    cell.innerHTML = `<div class="pnum" style="opacity:${muted ? 0.45 : 1}">${d.getDate()}</div>`;
-
-    const list = map.get(key) || [];
-    const show = list.slice(0, 3);
-    for (const ev of show){
-      const label = ev.source === "holiday" ? `★ ${ev.title}` : ev.title;
-      const div = document.createElement("div");
-      div.className = "pevt";
-      div.textContent = label;
-      cell.appendChild(div);
-    }
-
-    pGrid.appendChild(cell);
-    d.setDate(d.getDate()+1);
-  }
-
-  pUpcoming.innerHTML = "";
-  const includeHolUpcoming = holUpcomingToggle.checked;
-  const now = new Date();
-  const upMerged = [
-    ...primaryEvents,
-    ...(includeHolUpcoming ? holidayEvents : []),
-  ]
-    .filter(ev => startMs(ev) >= now.getTime())
-    .sort((a,b)=> startMs(a)-startMs(b))
-    .slice(0, 10);
-
-  if (upMerged.length === 0){
-    pUpcoming.textContent = "No upcoming events.";
-  } else {
-    for (const ev of upMerged){
-      const row = document.createElement("div");
-      row.className = "pupItem";
-      row.innerHTML = `<span class="pupWhen">${escapeHtml(fmtUpcomingWhen(ev))}</span> — ${escapeHtml(ev.title)}`;
-      pUpcoming.appendChild(row);
+function countEventsByMonthYear(year){
+  // Count by START month (simple, predictable)
+  const evs = eventsForInsightsYear(year);
+  const counts = Array(12).fill(0);
+  for (const ev of evs){
+    const s = new Date(ev.start);
+    if (s.getFullYear() === year){
+      counts[s.getMonth()]++;
     }
   }
+  return counts;
+}
 
-  pJournal.innerHTML = "";
-  const entries = getJournalEntriesForMonth(viewMonth).slice(0, PRINT_JOURNAL_MAX);
-  if (entries.length === 0){
-    pJournal.textContent = "No journal entries this month.";
-  } else {
-    for (const ent of entries){
-      const row = document.createElement("div");
-      row.className = "pjItem";
-      row.innerHTML = `<div class="pjDate">${escapeHtml(ent.date)}</div>
-                       <div class="pjText">${escapeHtml(ent.text)}</div>`;
-      pJournal.appendChild(row);
-    }
+function countJournalByMonthYear(year){
+  const counts = Array(12).fill(0);
+  for (let m=0; m<12; m++){
+    const entries = getJournalEntriesForMonth(new Date(year, m, 1));
+    counts[m] = entries.length;
   }
+  return counts;
 }
 
 function getJournalEntriesForMonth(monthDate){
   const Y = monthDate.getFullYear();
   const M = monthDate.getMonth();
-
   const entries = [];
   let d = new Date(Y, M, 1);
   while (d.getMonth() === M){
     const key = ymd(d);
     const v = localStorage.getItem(journalKey(key));
     if (v && String(v).trim().length > 0){
-      const pretty = d.toLocaleDateString(undefined, { month:"short", day:"numeric", year:"numeric" });
-      entries.push({ ymd: key, date: pretty, text: String(v).trim().slice(0, 240) });
+      entries.push({ ymd: key, text: String(v).trim() });
     }
     d.setDate(d.getDate()+1);
   }
@@ -1376,16 +1373,333 @@ function getJournalEntriesForMonth(monthDate){
   return entries;
 }
 
+function getJournalEntryDatesSet(){
+  // Scan localStorage keys for journal:v1:YYYY-MM-DD
+  const set = new Set();
+  for (let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if (!k) continue;
+    if (k.startsWith("journal:v1:")){
+      const day = k.slice("journal:v1:".length);
+      const v = localStorage.getItem(k);
+      if (v && String(v).trim().length > 0) set.add(day);
+    }
+  }
+  return set;
+}
+
+function computeStreaks(){
+  const set = getJournalEntryDatesSet();
+  if (set.size === 0) return { current:0, longest:0 };
+
+  // Sort dates ascending
+  const arr = [...set].sort();
+  let longest = 1;
+  let run = 1;
+
+  for (let i=1; i<arr.length; i++){
+    const prev = parseYMD(arr[i-1]);
+    const cur = parseYMD(arr[i]);
+    const diffDays = Math.round((cur - prev) / (24*60*60*1000));
+    if (diffDays === 1){
+      run++;
+      longest = Math.max(longest, run);
+    } else {
+      run = 1;
+    }
+  }
+
+  // current streak ending today or yesterday (nice UX)
+  const today = clampToDay(new Date());
+  const todayKey = ymd(today);
+  const yesterdayKey = ymd(addDays(today, -1));
+  let endKey = null;
+  if (set.has(todayKey)) endKey = todayKey;
+  else if (set.has(yesterdayKey)) endKey = yesterdayKey;
+
+  let current = 0;
+  if (endKey){
+    let cursor = parseYMD(endKey);
+    while (true){
+      const k = ymd(cursor);
+      if (!set.has(k)) break;
+      current++;
+      cursor = addDays(cursor, -1);
+    }
+  }
+
+  return { current, longest };
+}
+
+function countJournalInMonth(monthDate){
+  return getJournalEntriesForMonth(monthDate).length;
+}
+
+function countEventsInMonth(monthDate){
+  const includeHol = insIncludeHolidays.checked;
+  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
+  const start = startOfMonth(monthDate);
+  const end = endOfMonth(monthDate);
+  let count = 0;
+  for (const ev of merged){
+    const s = new Date(ev.start);
+    const e = new Date(ev.end);
+    // overlaps month window
+    if (s < end && e > start) count++;
+  }
+  return count;
+}
+
+function renderTiles(){
+  const mEntries = countJournalInMonth(viewMonth);
+  tileEntriesMonth.textContent = String(mEntries);
+  tileEntriesMonthSub.textContent = mEntries === 1 ? "entry" : "entries";
+
+  const { current, longest } = computeStreaks();
+  tileStreak.textContent = String(current);
+  tileLongest.textContent = String(longest);
+
+  const mEvents = countEventsInMonth(viewMonth);
+  tileEventsMonth.textContent = String(mEvents);
+  tileEventsMonthSub.textContent = insIncludeHolidays.checked ? "incl. holidays" : "excl. holidays";
+}
+
+function drawYearChart(){
+  const ctx = yearChart.getContext("2d");
+  const rect = yearChart.getBoundingClientRect();
+
+  // match device pixel ratio for crispness
+  const dpr = window.devicePixelRatio || 1;
+  yearChart.width = Math.floor(rect.width * dpr);
+  yearChart.height = Math.floor(160 * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  const w = rect.width;
+  const h = 160;
+  ctx.clearRect(0,0,w,h);
+
+  // background grid lines
+  ctx.globalAlpha = 1;
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  for (let i=1;i<=3;i++){
+    const y = Math.round((h-28) * (i/4)) + 10;
+    ctx.beginPath(); ctx.moveTo(10,y); ctx.lineTo(w-10,y); ctx.stroke();
+  }
+
+  const year = viewMonth.getFullYear();
+  const evCounts = countEventsByMonthYear(year);
+  const jCounts = countJournalByMonthYear(year);
+
+  const maxVal = Math.max(1, ...evCounts, ...(insOverlayJournal.checked ? jCounts : [0]));
+  const chartTop = 12;
+  const chartBottom = h - 26;
+  const chartHeight = chartBottom - chartTop;
+
+  const left = 12;
+  const right = w - 12;
+  const innerW = right - left;
+
+  const barW = innerW / 12;
+  const gap = Math.max(4, barW * 0.18);
+  const usableBarW = barW - gap;
+
+  // Bars (events)
+  for (let m=0; m<12; m++){
+    const val = evCounts[m];
+    const x = left + m*barW + gap/2;
+    const barH = (val / maxVal) * chartHeight;
+    const y = chartBottom - barH;
+
+    // bar fill: subtle, based on month color
+    ctx.fillStyle = monthVarToComputedColor(monthColorVar(m));
+    ctx.globalAlpha = 0.35;
+    ctx.fillRect(x, y, usableBarW, barH);
+
+    // bar outline
+    ctx.globalAlpha = 0.75;
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.strokeRect(x+0.5, y+0.5, usableBarW-1, barH-1);
+
+    // month labels
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = "rgba(232,237,244,0.78)";
+    ctx.font = "10px ui-sans-serif, system-ui";
+    const label = MONTH_ABBR[m];
+    const tw = ctx.measureText(label).width;
+    ctx.fillText(label, x + usableBarW/2 - tw/2, h - 8);
+  }
+
+  // Journal overlay line (optional)
+  if (insOverlayJournal.checked){
+    ctx.globalAlpha = 0.95;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(232,237,244,0.75)";
+    ctx.beginPath();
+    for (let m=0; m<12; m++){
+      const val = jCounts[m];
+      const x = left + m*barW + gap/2 + usableBarW/2;
+      const y = chartBottom - (val / maxVal) * chartHeight;
+      if (m===0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // points
+    ctx.fillStyle = "rgba(232,237,244,0.82)";
+    for (let m=0; m<12; m++){
+      const val = jCounts[m];
+      const x = left + m*barW + gap/2 + usableBarW/2;
+      const y = chartBottom - (val / maxVal) * chartHeight;
+      ctx.beginPath();
+      ctx.arc(x, y, 2.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // Title info
+  insYearEl.textContent = String(year);
+  insightsMeta.textContent = insIncludeHolidays.checked ? "Year view (incl. holidays)" : "Year view (events only)";
+}
+
+/** Convert css var like "var(--tab1)" to actual computed color string */
+function monthVarToComputedColor(varStr){
+  // set a temp style var and read computed value
+  // safer: map directly from root computed styles
+  const cs = getComputedStyle(document.documentElement);
+  const match = /var\(--(tab\d+)\)/.exec(varStr);
+  if (match){
+    const v = cs.getPropertyValue(`--${match[1]}`).trim();
+    return v || "rgba(255,255,255,0.35)";
+  }
+  return "rgba(255,255,255,0.35)";
+}
+
+function buildHeatGrid(){
+  heatGrid.innerHTML = "";
+  heatLegend.innerHTML = "";
+
+  const includeHol = insIncludeHolidays.checked;
+  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
+
+  const start = startOfMonth(viewMonth);
+  const end = endOfMonth(viewMonth);
+  const gridStart = new Date(start);
+  gridStart.setDate(gridStart.getDate() - gridStart.getDay()); // start Sunday
+
+  // Determine how many cells: whole weeks covering the month
+  const cells = [];
+  const d = new Date(gridStart);
+  while (d < end || d.getDay() !== 0){
+    cells.push(new Date(d));
+    d.setDate(d.getDate()+1);
+    // Stop after a safe bound
+    if (cells.length > 42) break;
+  }
+
+  // Count per day overlap
+  const counts = new Map(); // ymd -> number
+  for (const day of cells){
+    const key = ymd(day);
+    counts.set(key, 0);
+  }
+
+  for (const ev of merged){
+    const s = new Date(ev.start);
+    const e = new Date(ev.end);
+    // scan overlap only within month window for speed
+    const windowStart = new Date(Math.max(s.getTime(), start.getTime()));
+    const windowEnd = new Date(Math.min(e.getTime(), end.getTime()));
+    if (windowEnd <= windowStart) continue;
+
+    // walk day by day
+    let cursor = clampToDay(windowStart);
+    const endDayEx = clampToDay(windowEnd);
+    // treat end as exclusive for all-day cases; clamp logic already handles typical ICS end
+    while (cursor < endDayEx || ymd(cursor) === ymd(windowStart)){
+      const k = ymd(cursor);
+      if (counts.has(k)) counts.set(k, counts.get(k)+1);
+      cursor = addDays(cursor, 1);
+      if (cursor > addDays(end, 2)) break;
+    }
+  }
+
+  const maxCount = Math.max(1, ...counts.values());
+  const journalSet = getJournalEntryDatesSet();
+
+  // Legend blocks
+  const steps = 4;
+  for (let i=0;i<=steps;i++){
+    const block = document.createElement("span");
+    block.className = "legDot";
+    const intensity = i/steps;
+    block.style.background = heatColor(intensity);
+    heatLegend.appendChild(block);
+  }
+  const lab = document.createElement("span");
+  lab.textContent = "Less → More";
+  heatLegend.appendChild(lab);
+
+  // Cells render
+  for (const day of cells){
+    const k = ymd(day);
+    const inMonth = day.getMonth() === viewMonth.getMonth();
+    const c = counts.get(k) || 0;
+    const intensity = c / maxCount;
+
+    const cell = document.createElement("div");
+    cell.className = "heatCell" + (inMonth ? "" : " muted");
+    cell.style.background = heatColor(intensity);
+    cell.title = `${day.toLocaleDateString(undefined,{month:"short",day:"numeric"})}: ${c} item${c===1?"":"s"}${journalSet.has(k) ? " · journal" : ""}`;
+
+    if (journalSet.has(k)){
+      const j = document.createElement("div");
+      j.className = "j";
+      cell.appendChild(j);
+    }
+
+    cell.addEventListener("click", () => {
+      // Jump + select day
+      // If it's outside view month, switch viewMonth to that day’s month
+      if (day.getMonth() !== viewMonth.getMonth() || day.getFullYear() !== viewMonth.getFullYear()){
+        viewMonth = new Date(day.getFullYear(), day.getMonth(), 1);
+        render();
+        // after render, select
+        setTimeout(() => selectDay(ymd(day)), 0);
+      } else {
+        selectDay(k);
+      }
+    });
+
+    heatGrid.appendChild(cell);
+  }
+}
+
+function heatColor(intensity){
+  // Dark base + accent tint with intensity (no fixed colors; uses current accent)
+  // Mix accent into near-black
+  const a = Math.max(0, Math.min(1, intensity));
+  // Use CSS color-mix for nice results; fallback: alpha overlay
+  return `color-mix(in oklab, rgba(255,255,255,0.06) ${(1-a)*100}%, var(--accent) ${(a)*100}%)`;
+}
+
+function renderInsights(){
+  renderTiles();
+  drawYearChart();
+  buildHeatGrid();
+}
+
 /** ===== Render / Load ===== */
 function render(){
   renderUpcoming();
   renderMonthGrid();
+  renderInsights();
 }
 
 async function load(){
   buildMonthTabs();
   setAccentForMonth(viewMonth.getMonth());
-  elStatus.textContent = "Loading local mirrored calendars… (run GitHub Action once if empty)";
+  elStatus.textContent = "Loading local mirrored calendars…";
 
   try{
     const [primaryText, holidayText] = await Promise.all([
@@ -1407,11 +1721,15 @@ async function load(){
     selectedYMD = ymd(new Date());
     render();
 
-    window.addEventListener("resize", debounce(() => renderMonthGrid(), 150));
+    window.addEventListener("resize", debounce(() => {
+      renderMonthGrid();
+      drawYearChart();
+    }, 150));
   } catch (e){
     console.error(e);
     elStatus.textContent = String(e);
     elUpcoming.innerHTML = `<div class="upcomingItem"><div class="upcomingWhen">Error</div><div class="upcomingTitle">Calendar could not be loaded</div></div>`;
+    renderInsights(); // still show journal-only insights
   }
 }
 
