@@ -721,6 +721,7 @@
 
       /* Hide controls that don't belong on paper */
       #printBtn,
+      #exportCsvBtn,
       .nav button,
       .scrollHint,
       .status{
@@ -886,6 +887,7 @@
 
       /* Hide UI controls that don't belong on paper */
       #printBtn,
+      #exportCsvBtn,
       .nav button,
       .scrollHint,
       .status{
@@ -1077,6 +1079,7 @@
               <div class="btnRow">
                 <button id="saveBtn" class="btn" type="button">Save</button>
                 <button id="clearBtn" class="btn" type="button">Clear</button>
+                <button id="exportCsvBtn" class="btn" type="button" title="Download all journal entries for this year as CSV">Export Year (CSV)</button>
               </div>
               <div class="hint">
                 Tip: Click any day in the calendar (or the heat strip) to jump and write.
@@ -1127,6 +1130,7 @@ const selectedDateLabel = document.getElementById("selectedDateLabel");
 const journalText = document.getElementById("journalText");
 const saveBtn = document.getElementById("saveBtn");
 const clearBtn = document.getElementById("clearBtn");
+const exportCsvBtn = document.getElementById("exportCsvBtn");
 
 const printBtn = document.getElementById("printBtn");
 
@@ -1173,6 +1177,10 @@ clearBtn.addEventListener("click", () => {
   bumpSelectedMeta("Cleared");
   updateJournalDots();
   renderInsights();
+});
+
+exportCsvBtn.addEventListener("click", () => {
+  exportJournalYearCSV(viewMonth.getFullYear());
 });
 
 
@@ -1332,6 +1340,56 @@ function debounce(fn, ms){
     clearTimeout(t);
     t = setTimeout(() => fn(...args), ms);
   };
+}
+
+/** ===== Export (CSV) ===== */
+function exportJournalYearCSV(year){
+  const PREFIX = "journal:";
+  const rows = [];
+
+  for (let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith(PREFIX)) continue;
+
+    const date = key.slice(PREFIX.length); // YYYY-MM-DD
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+
+    const entryYear = parseInt(date.slice(0,4), 10);
+    if (entryYear !== year) continue;
+
+    const text = (localStorage.getItem(key) || "").trim();
+    if (!text) continue;
+
+    rows.push({ date, text });
+  }
+
+  if (rows.length === 0){
+    alert(`No journal entries found for ${year}.`);
+    return;
+  }
+
+  rows.sort((a,b) => a.date.localeCompare(b.date));
+
+  const csvEscape = (v) =>
+    `"${String(v).replace(/"/g, '""')}"`;
+
+  const lines = ["date,entry"];
+  for (const r of rows){
+    lines.push(`${csvEscape(r.date)},${csvEscape(r.text)}`);
+  }
+
+  const csv = lines.join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `monthly-journal-${year}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 500);
 }
 
 /** ===== Accent ===== */
