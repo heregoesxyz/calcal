@@ -660,126 +660,9 @@
     /* ===== PRINT ===== */
     #printSheet{display:none;color:#000;background:#fff;width:100%}
     #printSheet .pwrap{width:100%}
-
-    /* Print layout styling */
-    #printSheet .pHead{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:12px;
-      border-bottom:2px solid #111;
-      padding-bottom:8px;
-      margin-bottom:10px;
-    }
-    #printSheet .pTitle{
-      font-size:22px;
-      font-weight:900;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-    }
-    #printSheet .pMeta{
-      font-size:12px;
-      opacity:.85;
-      text-align:right;
-      white-space:nowrap;
-    }
-
-    #printSheet .pLayout{
-      display:grid;
-      grid-template-columns: 1fr 3.2in; /* calendar + side list */
-      gap:12px;
-      align-items:start;
-    }
-    #printSheet .pCal{ border:1px solid #111; }
-    #printSheet .pDow{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-      font-size:11px;
-      font-weight:800;
-      letter-spacing:.12em;
-      padding:6px 8px;
-      border-bottom:1px solid #111;
-      background:#f3f3f3;
-    }
-    #printSheet .pGrid{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-    }
-    #printSheet .pDay{
-      min-height:74px;
-      border-right:1px solid #111;
-      border-bottom:1px solid #111;
-      padding:6px 6px 4px;
-      position:relative;
-      overflow:hidden;
-    }
-    #printSheet .pDay:nth-child(7n){ border-right:none; }
-    #printSheet .pDay.muted{
-      background:#fafafa;
-      color:#7b7b7b;
-    }
-    #printSheet .pNumRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-      margin-bottom:4px;
-    }
-    #printSheet .pNum{
-      font-size:12px;
-      font-weight:900;
-    }
-    #printSheet .pJDot{
-      width:8px;height:8px;border-radius:50%;
-      background:#111;
-      flex:0 0 auto;
-      opacity:.9;
-    }
-    #printSheet .pMini{
-      font-size:10px;
-      line-height:1.25;
-      margin-top:2px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    #printSheet .pMini.holiday{ opacity:.75; }
-    #printSheet .pMini.more{ opacity:.7; font-style:italic; }
-
-    #printSheet .pSide{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    #printSheet .pBlock{
-      border:1px solid #111;
-      padding:8px;
-    }
-    #printSheet .pBlockTitle{
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-      font-size:12px;
-      margin-bottom:6px;
-    }
-    #printSheet .pList{
-      font-size:12px;
-      line-height:1.35;
-      white-space:pre-wrap;
-    }
-    #printSheet .pFooter{
-      margin-top:10px;
-      font-size:11px;
-      opacity:.85;
-    }
-
     @media print{
       @page { size: letter landscape; margin: 0.35in; }
       html,body{height:auto !important;}
-      body > *:not(#printSheet){ display:none !important; }
-      #printSheet{ display:block !important; }
-    }
-html,body{height:auto !important;}
       body > *:not(#printSheet){ display:none !important; }
       #printSheet{ display:block !important; }
     }
@@ -927,37 +810,11 @@ html,body{height:auto !important;}
     </div>
   </main>
 
-  
-  <!-- PRINT SHEET (generated) -->
+  <!-- PRINT SHEET placeholder -->
   <section id="printSheet" aria-hidden="true">
     <div class="pwrap">
-      <div class="pHead">
-        <div class="pTitle" id="pTitle">MONTH</div>
-        <div class="pMeta" id="pMeta">Generated from Monthly Journal</div>
-      </div>
-
-      <div class="pLayout">
-        <div class="pCal">
-          <div class="pDow">
-            <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
-          </div>
-          <div id="pGrid" class="pGrid"></div>
-        </div>
-
-        <div class="pSide">
-          <div class="pBlock">
-            <div class="pBlockTitle">Events this month</div>
-            <div id="pEvents" class="pList"></div>
-          </div>
-
-          <div class="pBlock" style="margin-top:10px">
-            <div class="pBlockTitle">Journal days</div>
-            <div id="pJournalDays" class="pList"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="pFooter" id="pFooter"></div>
+      <h1>Monthly Journal</h1>
+      <p>Use the browser print dialog → Save as PDF.</p>
     </div>
   </section>
 
@@ -1037,7 +894,7 @@ clearBtn.addEventListener("click", () => {
   renderInsights();
 });
 
-printBtn.addEventListener("click", () => { preparePrintSheet(); window.print(); });
+printBtn.addEventListener("click", () => window.print());
 
 insIncludeHolidays.addEventListener("change", renderInsights);
 insOverlayJournal.addEventListener("change", renderInsights);
@@ -1825,166 +1682,6 @@ function renderInsights(){
   renderTiles();
   drawYearChart();
   buildHeatGrid();
-}
-
-/** ===== PRINT / EXPORT ===== */
-function fmtPrintMonthTitle(d){
-  return d.toLocaleString(undefined, { month:"long", year:"numeric" }).toUpperCase();
-}
-function fmtPrintDayLabel(d){
-  return d.toLocaleDateString(undefined, { month:"short", day:"numeric" });
-}
-function fmtPrintEventRange(ev){
-  const s = new Date(ev.start);
-  const e = new Date(ev.end);
-  const sDay = clampToDay(s);
-  const eDay = clampToDay(e);
-  // Many ICS all-day events store DTEND as exclusive. Our parser keeps DTEND as-is,
-  // so for print we show (end-1) for all-day spans that cross days.
-  let endDisplay = e;
-  if (ev.allDay){
-    // If end is exactly midnight and after start, treat it as exclusive and subtract 1 day.
-    if (e.getHours()===0 && e.getMinutes()===0 && e.getSeconds()===0 && eDay.getTime() > sDay.getTime()){
-      endDisplay = addDays(eDay, -1);
-    }
-  }
-
-  const sameDay = ymd(sDay) === ymd(clampToDay(endDisplay));
-  if (sameDay){
-    return fmtPrintDayLabel(sDay);
-  }
-  return `${fmtPrintDayLabel(sDay)}–${fmtPrintDayLabel(clampToDay(endDisplay))}`;
-}
-
-function preparePrintSheet(){
-  const pTitle = document.getElementById("pTitle");
-  const pMeta = document.getElementById("pMeta");
-  const pGrid = document.getElementById("pGrid");
-  const pEvents = document.getElementById("pEvents");
-  const pJournalDays = document.getElementById("pJournalDays");
-  const pFooter = document.getElementById("pFooter");
-
-  if (!pTitle || !pGrid) return;
-
-  // Title & meta
-  pTitle.textContent = fmtPrintMonthTitle(viewMonth);
-  const now = new Date();
-  pMeta.textContent = `Generated ${now.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})}`;
-
-  // Build 6-week grid for the viewed month
-  const monthNum = viewMonth.getMonth();
-  const gridStart = startOfGrid(viewMonth);
-  const end = endOfGrid(viewMonth);
-
-  // Map events by day for quick listing in cells
-  const includeHol = holMonthToggle.checked;
-  const merged = [...primaryEvents, ...(includeHol ? holidayEvents : [])];
-
-  const dayMap = new Map(); // ymd -> list
-  for (const ev of merged){
-    const s = new Date(ev.start);
-    const e = new Date(ev.end);
-    // mark all overlapping days for print counts, but list in cell by start day for readability
-    const key = ymd(clampToDay(s));
-    if (!dayMap.has(key)) dayMap.set(key, []);
-    dayMap.get(key).push(ev);
-  }
-  for (const [k, list] of dayMap.entries()){
-    list.sort((a,b)=> startMs(a)-startMs(b));
-  }
-
-  // Journal set (dots)
-  const journalSet = getJournalEntryDatesSet();
-
-  pGrid.innerHTML = "";
-  const cursor = new Date(gridStart);
-  const cells = [];
-  while (cursor < end){
-    cells.push(new Date(cursor));
-    cursor.setDate(cursor.getDate()+1);
-    if (cells.length > 42) break;
-  }
-
-  for (const d of cells){
-    const k = ymd(d);
-    const cell = document.createElement("div");
-    cell.className = "pDay" + (d.getMonth() !== monthNum ? " muted" : "");
-
-    const row = document.createElement("div");
-    row.className = "pNumRow";
-
-    const num = document.createElement("div");
-    num.className = "pNum";
-    num.textContent = String(d.getDate());
-    row.appendChild(num);
-
-    if (journalSet.has(k)){
-      const dot = document.createElement("div");
-      dot.className = "pJDot";
-      row.appendChild(dot);
-    }
-
-    cell.appendChild(row);
-
-    const list = (dayMap.get(k) || []).slice(0, 3);
-    for (const ev of list){
-      const line = document.createElement("div");
-      line.className = "pMini" + (ev.source==="holiday" ? " holiday" : "");
-      line.textContent = ev.title;
-      cell.appendChild(line);
-    }
-    const total = (dayMap.get(k) || []).length;
-    if (total > 3){
-      const more = document.createElement("div");
-      more.className = "pMini more";
-      more.textContent = `+${total-3} more`;
-      cell.appendChild(more);
-    }
-
-    pGrid.appendChild(cell);
-  }
-
-  // Side: events list (sorted by start)
-  const monthStart = startOfMonth(viewMonth);
-  const monthEnd = endOfMonth(viewMonth);
-  const monthEvents = merged
-    .filter(ev => {
-      const s = new Date(ev.start);
-      const e = new Date(ev.end);
-      return s < monthEnd && e > monthStart;
-    })
-    .sort((a,b)=> startMs(a)-startMs(b));
-
-  if (monthEvents.length === 0){
-    pEvents.textContent = "No events in this month.";
-  } else {
-    const lines = monthEvents.slice(0, 120).map(ev => {
-      const badge = ev.source==="holiday" ? "Holiday" : (ev.allDay ? "All-day" : "Event");
-      return `• ${fmtPrintEventRange(ev)} · ${ev.title} (${badge})`;
-    });
-    if (monthEvents.length > 120) lines.push(`• …and ${monthEvents.length-120} more`);
-    pEvents.textContent = lines.join("\\n");
-  }
-
-  // Side: journal days list
-  const journalDays = [];
-  let jd = new Date(monthStart);
-  while (jd < monthEnd){
-    const key = ymd(jd);
-    if (journalSet.has(key)) journalDays.push(key);
-    jd.setDate(jd.getDate()+1);
-  }
-  if (journalDays.length === 0){
-    pJournalDays.textContent = "No journal entries in this month.";
-  } else {
-    const lines = journalDays.map(key => {
-      const d = parseYMD(key);
-      return `• ${d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}`;
-    });
-    pJournalDays.textContent = lines.join("\\n");
-  }
-
-  pFooter.textContent = `Monthly Journal · ${fmtPrintMonthTitle(viewMonth)} · Letter Landscape`;
 }
 
 /** ===== Render / Load ===== */
