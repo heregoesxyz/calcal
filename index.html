@@ -676,9 +676,44 @@
         --barHoliday:#dbeafe;
         --barBorder:rgba(0,0,0,.22);
         --barText:#111111;
+
+      /* --- Keep desktop two-column layout in print (avoid responsive stacking) --- */
+      .layout{
+        grid-template-columns: minmax(0, 1fr) 360px !important;
+        grid-template-areas:
+          "cal insights"
+          "journal journal" !important;
       }
 
+      /* Print scaling: preserve on-screen positioning, then scale down to fit one portrait page.
+         Adjust --printScale if you want it larger/smaller (0.60–0.78 is typical). */
+      :root{ --printScale: 0.70; --printBaseWidth: 1180px; }
 
+      body{ margin:0 !important; }
+
+      /* Lock the layout to a desktop-like width so the grid doesn't collapse, then scale it */
+      .topbar,
+      .container{
+        width: var(--printBaseWidth) !important;
+        max-width: none !important;
+      }
+
+      /* Scale everything (topbar + upcoming + calendar + insights + journal panel) */
+      .app{
+        transform: scale(var(--printScale)) !important;
+        transform-origin: top left !important;
+        width: var(--printBaseWidth) !important;
+      }
+
+      /* Prevent extra whitespace / clipping after scaling */
+      html, body{
+        overflow: visible !important;
+      }
+
+      /* Never print the legacy placeholder section at the bottom */
+      #printSheet{ display:none !important; }
+
+    }
       html,body{
         height:auto !important;
         overflow:visible !important;
@@ -764,6 +799,7 @@
 </head>
 
 <body>
+  <div class="app">
   <header class="topbar">
     <div class="brand">
       <div class="title">Monthly Journal</div>
@@ -911,6 +947,9 @@
       <p>Use the browser print dialog → Save as PDF.</p>
     </div>
   </section>
+
+</div>
+
 
 <script>
 /** ===== FEEDS (local mirrored, no CORS) ===== */
