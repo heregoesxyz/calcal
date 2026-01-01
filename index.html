@@ -743,6 +743,40 @@
       }
     }
 
+  
+    /* Print-only journal rendering */
+    .journalPrintEntry{
+      display:none;
+      white-space:pre-wrap;
+      line-height:1.35;
+      font-size:12px;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      background: rgba(255,255,255,.04);
+      min-height: 120px;
+    }
+    @media print{
+      /* In print, show only the entry text; hide the editor UI */
+      #journalText,
+      #saveBtn,
+      #clearBtn,
+      .journalRight .btnRow,
+      .journalRight .hint,
+      .journalLeft .meta{
+        display:none !important;
+      }
+      .journalPrintEntry{
+        display:block !important;
+        border-color: rgba(0,0,0,.18) !important;
+        background:#fff !important;
+      }
+      /* If there's no journal entry, omit the entire panel to keep the page clean */
+      body.print-no-journal .journalPanel{
+        display:none !important;
+      }
+    }
+
   </style>
 </head>
 
@@ -872,6 +906,7 @@
             </div>
 
             <div class="journalRight">
+              <div id="journalPrintEntry" class="journalPrintEntry" aria-label="Journal entry for print"></div>
               <textarea id="journalText" placeholder="Write a journal entry… (saved locally)"></textarea>
               <div class="btnRow">
                 <button id="saveBtn" class="btn" type="button">Save</button>
@@ -971,11 +1006,24 @@ clearBtn.addEventListener("click", () => {
   renderInsights();
 });
 
+function updatePrintJournal(){
+  // For printing, show only the saved journal entry text (if any).
+  const out = document.getElementById("journalPrintEntry");
+  if(!out) return;
+  const ymd = selectedYMD;
+  const entry = ymd ? (localStorage.getItem(journalKey(ymd)) || "") : "";
+  out.textContent = entry.trim();
+  document.body.classList.toggle("print-no-journal", !out.textContent);
+}
+
+
 
 function prepareForPrint(){
   // Add a class so you can target additional print overrides if needed.
   document.documentElement.classList.add("is-printing");
   document.body.classList.add("is-printing");
+
+  updatePrintJournal();
 
   // Recompute layout-dependent elements (multiday bars + chart) after print CSS applies.
   // Use two frames to allow style recalculation before measuring.
@@ -991,6 +1039,9 @@ function prepareForPrint(){
 function cleanupAfterPrint(){
   document.documentElement.classList.remove("is-printing");
   document.body.classList.remove("is-printing");
+  document.body.classList.remove("print-no-journal");
+  const out = document.getElementById("journalPrintEntry");
+  if(out) out.textContent = "";
 
   // Restore on-screen layout (bars depend on measurements).
   requestAnimationFrame(() => {
