@@ -1,0 +1,29 @@
+name: Fetch iCal feeds
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 7 * * *"   # daily at 07:17 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download iCal feeds
+        run: |
+          mkdir -p data
+          curl -L --fail "https://calendar.google.com/calendar/ical/4b06862e65f8f6a412554b6923e1358e09f7ef660d834549dbf1bb9151dcb72d%40group.calendar.google.com/public/basic.ics" -o data/primary.ics
+          curl -L --fail "https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics" -o data/holidays.ics
+
+      - name: Commit updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/primary.ics data/holidays.ics
+          git commit -m "Update iCal feeds" || echo "No changes to commit"
+          git push
