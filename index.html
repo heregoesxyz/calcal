@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dark Monthly Planner</title>
+  <style>
+    :root{
+      --bg:#0b0d10;
+      --muted:#8a93a0;
+      --text:#e8edf4;
+      --line:rgba(255,255,255,.08);
+
+      --cardA:rgba(255,255,255,.04);
+      --cardB:rgba(255,255,255,.02);
+
+      --tab1:#1d4ed8; /* Jan */
+      --tab2:#0ea5e9; /* Feb */
+      --tab3:#22c55e; /* Mar */
+      --tab4:#94a3b8; /* Apr */
+      --tab5:#f59e0b; /* May */
+      --tab6:#fb7185; /* Jun */
+      --tab7:#a78bfa; /* Jul */
+      --tab8:#60a5fa; /* Aug */
+      --tab9:#34d399; /* Sep */
+      --tab10:#f97316;/* Oct */
+      --tab11:#f43f5e;/* Nov */
+      --tab12:#eab308;/* Dec */
+
+      --barPrimary:#2a3340;
+      --barHoliday:#203242;
+      --barBorder:rgba(255,255,255,.10);
+      --barText:rgba(232,237,244,.95);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 700px at 20% -10%, rgba(90,120,255,.10), transparent 60%),
+        radial-gradient(900px 600px at 100% 0%, rgba(255,180,90,.10), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      padding:22px 22px 10px;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .title{font-size:22px; letter-spacing:.06em; text-transform:uppercase}
+    .subtitle{color:var(--muted); font-size:12px; margin-top:4px}
+
+    .nav{
+      display:flex; align-items:center; gap:10px;
+    }
+    .nav button{
+      width:40px; height:40px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      border-radius:12px;
+      font-size:20px;
+      cursor:pointer;
+    }
+    .nav button:hover{background:rgba(255,255,255,.07)}
+    .monthLabel{
+      min-width:200px;
+      text-align:center;
+      font-weight:600;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:rgba(232,237,244,.92);
+    }
+
+    .upcomingSticky{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter: blur(10px);
+      background: rgba(11,13,16,.65);
+      border-top:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      padding:10px 22px 12px;
+    }
+    .upcomingRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .upcomingHeader{
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+    .toggles{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      color:rgba(232,237,244,.85);
+      font-size:12px;
+      user-select:none;
+    }
+    .toggles label{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      padding:6px 10px;
+      border-radius:999px;
+      cursor:pointer;
+    }
+    .upcomingList{
+      display:flex;
+      gap:10px;
+      overflow:auto;
+      padding-bottom:2px;
+      scroll-snap-type:x mandatory;
+    }
+    .upcomingItem{
+      scroll-snap-align:start;
+      min-width:240px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      border-radius:16px;
+      padding:10px 12px;
+    }
+    .upcomingWhen{color:var(--muted); font-size:12px}
+    .upcomingTitle{margin-top:6px; font-weight:600; font-size:14px; line-height:1.2}
+    .badge{
+      display:inline-block;
+      margin-top:8px;
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:rgba(232,237,244,.85);
+    }
+
+    .status{
+      color:var(--muted);
+      font-size:12px;
+      padding:0 22px 12px;
+    }
+
+    /* ====== LAYOUT: calendar + right rail (tabs + journal) ====== */
+    .container{padding:18px 22px 30px}
+    .layout{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+    }
+
+    .calendarCard{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, var(--cardA), var(--cardB));
+      border-radius:22px;
+      overflow:hidden;
+      position:relative;
+      padding-right:50px; /* space for month tabs overlay */
+    }
+
+    .dow{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      padding:14px 14px 10px;
+      color:var(--muted);
+      font-size:11px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      border-bottom:1px solid var(--line);
+    }
+
+    /* ====== GRID ====== */
+    .gridWrap{
+      position:relative;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+    }
+    .day{
+      min-height:128px;
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      padding:12px;
+      position:relative;
+      cursor:pointer;
+    }
+    .day:hover{
+      background:rgba(255,255,255,.02);
+    }
+    .day:nth-child(7n){border-right:none}
+    .day.selected{
+      outline:2px solid rgba(255,255,255,.18);
+      outline-offset:-2px;
+      background:rgba(255,255,255,.03);
+    }
+    .dayNum{
+      color:rgba(232,237,244,.92);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.06em;
+    }
+    .dayNum.muted{color:rgba(138,147,160,.70)}
+    .todayDot{
+      position:absolute;
+      top:12px; right:12px;
+      width:8px; height:8px; border-radius:50%;
+      background:rgba(255,255,255,.65);
+      box-shadow:0 0 0 3px rgba(255,255,255,.08);
+    }
+
+    /* Multiday bars overlay layer */
+    .barsLayer{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+    }
+    .bar{
+      position:absolute;
+      height:18px;
+      border:1px solid var(--barBorder);
+      border-radius:10px;
+      padding:0 8px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      color:var(--barText);
+      background:var(--barPrimary);
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+      box-shadow:0 4px 12px rgba(0,0,0,.25);
+      pointer-events:auto; /* allow click */
+      cursor:pointer;
+    }
+    .bar.holiday{ background: var(--barHoliday); }
+    .bar .tiny{
+      font-size:10px;
+      color:rgba(232,237,244,.75);
+      margin-left:auto;
+    }
+
+    .chips{margin-top:26px; display:flex; flex-direction:column; gap:6px} /* leave space for bars */
+    .chip{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      border-radius:10px;
+      padding:6px 8px;
+      font-size:12px;
+      color:rgba(232,237,244,.92);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .chip.holiday{background:rgba(255,255,255,.06)}
+    .more{color:var(--muted); font-size:12px; margin-top:2px}
+
+    /* ====== RIGHT RAIL ====== */
+    .rail{
+      position:sticky;
+      top:86px; /* below topbar */
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .rail{position:relative; top:auto;}
+    }
+
+    .panel{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, var(--cardA), var(--cardB));
+      border-radius:22px;
+      overflow:hidden;
+    }
+    .panelHead{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .panelTitle{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .panelMeta{
+      font-size:12px;
+      color:rgba(232,237,244,.85);
+      font-weight:600;
+    }
+    .panelBody{padding:14px}
+
+    /* Month tabs (right edge overlay on calendar) */
+    .monthTabs{
+      position:absolute;
+      top:56px;
+      right:10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      z-index:5;
+    }
+    .tab{
+      width:34px;
+      height:42px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+    }
+    .tab:hover{background:rgba(255,255,255,.08)}
+    .tab.active{
+      outline:2px solid rgba(255,255,255,.18);
+      outline-offset:-2px;
+    }
+    .tab span{
+      font-size:10px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      transform:rotate(90deg);
+      color:rgba(232,237,244,.92);
+      font-weight:700;
+    }
+    .tab::before{
+      content:"";
+      position:absolute; inset:0;
+      opacity:.70;
+    }
+    .tab[data-m="0"]::before{ background:var(--tab1); }
+    .tab[data-m="1"]::before{ background:var(--tab2); }
+    .tab[data-m="2"]::before{ background:var(--tab3); }
+    .tab[data-m="3"]::before{ background:var(--tab4); }
+    .tab[data-m="4"]::before{ background:var(--tab5); }
+    .tab[data-m="5"]::before{ background:var(--tab6); }
+    .tab[data-m="6"]::before{ background:var(--tab7); }
+    .tab[data-m="7"]::before{ background:var(--tab8); }
+    .tab[data-m="8"]::before{ background:var(--tab9); }
+    .tab[data-m="9"]::before{ background:var(--tab10); }
+    .tab[data-m="10"]::before{ background:var(--tab11); }
+    .tab[data-m="11"]::before{ background:var(--tab12); }
+    .tab span{ position:relative; z-index:1; }
+
+    /* Journal */
+    .journalDate{
+      font-weight:700;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    textarea{
+      width:100%;
+      min-height:160px;
+      resize:vertical;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.25);
+      color:rgba(232,237,244,.95);
+      padding:12px 12px;
+      border-radius:14px;
+      outline:none;
+      font-size:13px;
+      line-height:1.45;
+    }
+    textarea:focus{
+      border-color:rgba(255,255,255,.18);
+      box-shadow:0 0 0 4px rgba(255,255,255,.06);
+    }
+    .btnRow{
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:rgba(232,237,244,.95);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:12px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      font-weight:700;
+      flex:1;
+    }
+    .btn:hover{background:rgba(255,255,255,.07)}
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="title">Monthly Journal</div>
+      <div class="subtitle">month tabs · multiday bars · journaling panel (localStorage)</div>
+    </div>
+
+    <div class="nav">
+      <button id="prevBtn" aria-label="Previous month">‹</button>
+      <div id="monthLabel" class="monthLabel"></div>
+      <button id="nextBtn" aria-label="Next month">›</button>
+    </div>
+  </header>
+
+  <section class="upcomingSticky">
+    <div class="upcomingRow">
+      <div class="upcomingHeader">Upcoming (next 5)</div>
+      <div class="toggles" title="Toggle holiday visibility">
+        <label><input id="holUpcoming" type="checkbox" checked /> Holidays in upcoming</label>
+        <label><input id="holMonth" type="checkbox" checked /> Holidays in month</label>
+      </div>
+    </div>
+    <div id="upcomingList" class="upcomingList"></div>
+  </section>
+
+  <div id="status" class="status"></div>
+
+  <main class="container">
+    <div class="layout">
+      <!-- CALENDAR -->
+      <section class="calendarCard">
+        <div class="dow">
+          <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+        </div>
+
+        <!-- Month tabs (right edge) -->
+        <div id="monthTabs" class="monthTabs" aria-label="Month tabs"></div>
+
+        <div class="gridWrap" id="gridWrap">
+          <div id="barsLayer" class="barsLayer"></div>
+          <div id="grid" class="grid"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT RAIL -->
+      <aside class="rail">
+        <section class="panel">
+          <div class="panelHead">
+            <div class="panelTitle">Selected day</div>
+            <div id="selectedMeta" class="panelMeta">—</div>
+          </div>
+          <div class="panelBody">
+            <div id="selectedDateLabel" class="journalDate">Click a day</div>
+            <div style="height:10px"></div>
+            <textarea id="journalText" placeholder="Write a quick journal entry… (saved locally)"></textarea>
+            <div class="btnRow">
+              <button id="saveBtn" class="btn" type="button">Save</button>
+              <button id="clearBtn" class="btn" type="button">Clear</button>
+            </div>
+            <div class="hint">
+              Notes are stored in <code>localStorage</code> on this device/browser only.
+              Click any day to view/edit its entry.
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panelHead">
+            <div class="panelTitle">Tips</div>
+            <div class="panelMeta">UI</div>
+          </div>
+          <div class="panelBody">
+            <div class="hint">
+              • Use the month tabs on the calendar's right edge to jump months.<br>
+              • Multi-day events draw as bars spanning across days/week rows.<br>
+              • Single-day timed/all-day events appear as chips inside day cells.
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+<script>
+/** ======️ CONFIG ====== **/
+const PRIMARY_ICS_URL =
+  "https://calendar.google.com/calendar/ical/4b06862e65f8f6a412554b6923e1358e09f7ef660d834549dbf1bb9151dcb72d%40group.calendar.google.com/public/basic.ics";
+
+const US_HOLIDAYS_ICS_URL =
+  "https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics";
+
+const UPCOMING_COUNT = 5;
+const MAX_DAY_CHIPS = 3;
+
+// GitHub Pages often hits CORS on .ics. Use a proxy by default.
+// If direct fetch works for you, set USE_CORS_PROXY=false.
+const USE_CORS_PROXY = true;
+const CORS_PROXY = "https://cors.isomorphic-git.org/"; // prepends to URL
+/** ===================== **/
+
+const elGrid = document.getElementById("grid");
+const elBars = document.getElementById("barsLayer");
+const elGridWrap = document.getElementById("gridWrap");
+
+const elUpcoming = document.getElementById("upcomingList");
+const elMonthLabel = document.getElementById("monthLabel");
+const elStatus = document.getElementById("status");
+
+const monthTabsEl = document.getElementById("monthTabs");
+
+const holUpcomingToggle = document.getElementById("holUpcoming");
+const holMonthToggle = document.getElementById("holMonth");
+
+const selectedMeta = document.getElementById("selectedMeta");
+const selectedDateLabel = document.getElementById("selectedDateLabel");
+const journalText = document.getElementById("journalText");
+const saveBtn = document.getElementById("saveBtn");
+const clearBtn = document.getElementById("clearBtn");
+
+document.getElementById("prevBtn").addEventListener("click", () => shiftMonth(-1));
+document.getElementById("nextBtn").addEventListener("click", () => shiftMonth(1));
+holUpcomingToggle.addEventListener("change", render);
+holMonthToggle.addEventListener("change", render);
+
+let viewMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let primaryEvents = [];
+let holidayEvents = [];
+
+// Selected day for journal
+let selectedYMD = null;
+
+saveBtn.addEventListener("click", () => {
+  if (!selectedYMD) return;
+  const key = journalKey(selectedYMD);
+  localStorage.setItem(key, journalText.value);
+  bumpSelectedMeta("Saved");
+});
+
+clearBtn.addEventListener("click", () => {
+  if (!selectedYMD) return;
+  const key = journalKey(selectedYMD);
+  localStorage.removeItem(key);
+  journalText.value = "";
+  bumpSelectedMeta("Cleared");
+});
+
+function bumpSelectedMeta(text){
+  selectedMeta.textContent = text;
+  setTimeout(() => {
+    // restore to event count if possible
+    selectedMeta.textContent = selectedYMD ? dayMeta(selectedYMD) : "—";
+  }, 900);
+}
+
+/** ====== DATE HELPERS ====== **/
+function ymd(d){
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+function parseYMD(s){
+  const [Y,M,D] = s.split("-").map(Number);
+  return new Date(Y, M-1, D);
+}
+function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
+function endOfMonth(d){ return new Date(d.getFullYear(), d.getMonth()+1, 0); }
+function startOfGrid(monthDate){
+  const s = startOfMonth(monthDate);
+  s.setDate(s.getDate() - s.getDay()); // to Sunday
+  return s;
+}
+function endOfGrid(monthDate){
+  const e = new Date(monthDate.getFullYear(), monthDate.getMonth()+1, 1);
+  e.setDate(e.getDate() + (7 - e.getDay())); // end at next Sunday
+  return e;
+}
+function addDays(d, n){
+  const x = new Date(d);
+  x.setDate(x.getDate()+n);
+  return x;
+}
+function clampToDay(d){
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function fmtMonthLabel(d){
+  return d.toLocaleString(undefined, { month:"long", year:"numeric" }).toUpperCase();
+}
+function safeFetchUrl(url){
+  return USE_CORS_PROXY ? (CORS_PROXY + url) : url;
+}
+
+/** ====== ICS PARSING ====== **/
+function normalizeICSDate(value){
+  // Supports DTSTART:20251231T170000Z, DTSTART;VALUE=DATE:20251231, DTSTART;TZID=...:20251231T090000
+  const v = value.trim();
+  if (/^\d{8}$/.test(v)) {
+    const yyyy=v.slice(0,4), mm=v.slice(4,6), dd=v.slice(6,8);
+    return { iso: `${yyyy}-${mm}-${dd}T00:00:00`, allDay:true };
+  }
+  let iso = v;
+  iso = iso.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/, "$1-$2-$3T$4:$5:$6Z");
+  iso = iso.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})$/, "$1-$2-$3T$4:$5:$6");
+  iso = iso.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})Z$/, "$1-$2-$3T$4:$5:00Z");
+  iso = iso.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})$/, "$1-$2-$3T$4:$5:00");
+  return { iso, allDay:false };
+}
+function unfoldICS(text){
+  return text.replace(/\r?\n[ \t]/g, "");
+}
+function parseICS(text, source){
+  const unfolded = unfoldICS(text);
+  const blocks = unfolded.split("BEGIN:VEVENT").slice(1);
+  const events = [];
+
+  for (const block of blocks){
+    const vevent = block.split("END:VEVENT")[0];
+    const lines = vevent.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+
+    let summary = "";
+    let dtstart = null;
+    let dtend = null;
+
+    for (const line of lines){
+      if (line.startsWith("SUMMARY:")) summary = line.slice(8).trim();
+      else if (line.startsWith("DTSTART")){
+        const raw = line.split(":").slice(1).join(":");
+        dtstart = normalizeICSDate(raw);
+      } else if (line.startsWith("DTEND")){
+        const raw = line.split(":").slice(1).join(":");
+        dtend = normalizeICSDate(raw);
+      }
+    }
+    if (!summary || !dtstart) continue;
+
+    // If DTEND missing, assume same as start.
+    const startIso = dtstart.iso;
+    let endIso = (dtend ? dtend.iso : dtstart.iso);
+
+    // All-day events in ICS usually have DTEND = next day (exclusive).
+    // We'll keep that as-is and treat end as exclusive for multiday spanning.
+    events.push({
+      id: (crypto?.randomUUID ? crypto.randomUUID() : String(Math.random())),
+      title: summary,
+      start: startIso,
+      end: endIso,
+      allDay: dtstart.allDay,
+      source, // primary | holiday
+    });
+  }
+  return events;
+}
+
+function startMs(ev){ return new Date(ev.start).getTime(); }
+function fmtUpcomingWhen(ev){
+  const d = new Date(ev.start);
+  return ev.allDay
+    ? d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })
+    : d.toLocaleString(undefined, { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
+}
+
+/** ====== UI: MONTH TABS ====== **/
+const MONTH_ABBR = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+function buildMonthTabs(){
+  monthTabsEl.innerHTML = "";
+  for (let m=0; m<12; m++){
+    const tab = document.createElement("div");
+    tab.className = "tab";
+    tab.dataset.m = String(m);
+    tab.title = MONTH_ABBR[m];
+    tab.innerHTML = `<span>${MONTH_ABBR[m]}</span>`;
+    tab.addEventListener("click", () => {
+      viewMonth = new Date(viewMonth.getFullYear(), m, 1);
+      render();
+    });
+    monthTabsEl.appendChild(tab);
+  }
+}
+function setActiveMonthTab(){
+  const m = viewMonth.getMonth();
+  [...monthTabsEl.querySelectorAll(".tab")].forEach(t => t.classList.toggle("active", Number(t.dataset.m)===m));
+}
+
+/** ====== UPCOMING STRIP ====== **/
+function renderUpcoming(){
+  const includeHol = holUpcomingToggle.checked;
+  const now = new Date();
+
+  const merged = [
+    ...primaryEvents,
+    ...(includeHol ? holidayEvents : []),
+  ]
+    .filter(ev => startMs(ev) >= now.getTime())
+    .sort((a,b)=> startMs(a)-startMs(b))
+    .slice(0, UPCOMING_COUNT);
+
+  elUpcoming.innerHTML = "";
+  if (merged.length === 0){
+    elUpcoming.innerHTML = `<div class="upcomingItem"><div class="upcomingWhen">No upcoming events</div><div class="upcomingTitle">Add events to your calendar</div></div>`;
+    return;
+  }
+  for (const ev of merged){
+    const badge = ev.source === "holiday" ? "Holiday" : (ev.allDay ? "All-day" : "Event");
+    const item = document.createElement("div");
+    item.className = "upcomingItem";
+    item.innerHTML = `
+      <div class="upcomingWhen">${fmtUpcomingWhen(ev)}</div>
+      <div class="upcomingTitle">${escapeHtml(ev.title)}</div>
+      <div class="badge">${badge}</div>
+    `;
+    elUpcoming.appendChild(item);
+  }
+}
+
+/** ====== MONTH GRID + MULTIDAY BARS ====== **/
+function shiftMonth(delta){
+  viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + delta, 1);
+  render();
+}
+
+function mergeForMonth(){
+  const includeHol = holMonthToggle.checked;
+  const merged = [
+    ...primaryEvents,
+    ...(includeHol ? holidayEvents : []),
+  ].sort((a,b)=> startMs(a)-startMs(b));
+  return merged;
+}
+
+function isMultiDaySpan(ev){
+  // Treat as multi-day if end day is after start day (considering end as exclusive for all-day)
+  const s = clampToDay(new Date(ev.start));
+  const e = clampToDay(new Date(ev.end));
+  return e.getTime() > s.getTime() + 0; // different day
+}
+
+function buildDayEventMap(singleDayEvents){
+  const map = new Map(); // ymd -> events
+  for (const ev of singleDayEvents){
+    const s = clampToDay(new Date(ev.start));
+    const key = ymd(s);
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(ev);
+  }
+  for (const [k, list] of map.entries()){
+    list.sort((a,b)=> startMs(a)-startMs(b));
+  }
+  return map;
+}
+
+function renderMonthGrid(){
+  setActiveMonthTab();
+  elMonthLabel.textContent = fmtMonthLabel(viewMonth);
+  elGrid.innerHTML = "";
+  elBars.innerHTML = "";
+
+  const merged = mergeForMonth();
+
+  const gridStart = startOfGrid(viewMonth);
+  const gridEnd = endOfGrid(viewMonth);
+
+  // Split events:
+  // - multiday: draw as bars spanning across the grid
+  // - single-day: draw as chips in cells
+  const multiday = [];
+  const singleDay = [];
+  for (const ev of merged){
+    if (isMultiDaySpan(ev)) multiday.push(ev);
+    else singleDay.push(ev);
+  }
+
+  // Build day list + cell index map
+  const days = [];
+  const dayIndex = new Map(); // ymd -> index
+  const d = new Date(gridStart);
+  while (d < gridEnd){
+    const key = ymd(d);
+    dayIndex.set(key, days.length);
+    days.push(new Date(d));
+    d.setDate(d.getDate()+1);
+  }
+
+  // Render cells
+  const today = new Date();
+  const monthNum = viewMonth.getMonth();
+  for (let i=0; i<days.length; i++){
+    const date = days[i];
+    const key = ymd(date);
+
+    const cell = document.createElement("div");
+    cell.className = "day";
+    cell.dataset.ymd = key;
+
+    const muted = date.getMonth() !== monthNum;
+    const num = document.createElement("div");
+    num.className = "dayNum" + (muted ? " muted" : "");
+    num.textContent = String(date.getDate());
+    cell.appendChild(num);
+
+    if (date.getFullYear()===today.getFullYear() && date.getMonth()===today.getMonth() && date.getDate()===today.getDate()){
+      const dot = document.createElement("div");
+      dot.className = "todayDot";
+      cell.appendChild(dot);
+    }
+
+    cell.addEventListener("click", () => selectDay(key));
+
+    // chips placeholder (filled later)
+    const chipsWrap = document.createElement("div");
+    chipsWrap.className = "chips";
+    chipsWrap.dataset.chipsFor = key;
+    cell.appendChild(chipsWrap);
+
+    elGrid.appendChild(cell);
+  }
+
+  // Chips for single-day events
+  const map = buildDayEventMap(singleDay);
+  for (const [key, list] of map.entries()){
+    const chipsWrap = elGrid.querySelector(`.chips[data-chips-for="${key}"]`);
+    if (!chipsWrap) continue;
+    const show = list.slice(0, MAX_DAY_CHIPS);
+    for (const ev of show){
+      const chip = document.createElement("div");
+      chip.className = "chip" + (ev.source==="holiday" ? " holiday" : "");
+      chip.title = ev.title;
+      chip.textContent = ev.title;
+      chipsWrap.appendChild(chip);
+    }
+    if (list.length > MAX_DAY_CHIPS){
+      const more = document.createElement("div");
+      more.className = "more";
+      more.textContent = `+${list.length - MAX_DAY_CHIPS} more`;
+      chipsWrap.appendChild(more);
+    }
+  }
+
+  // Bars for multi-day events (spanning across week rows)
+  layoutMultiDayBars(multiday, gridStart, gridEnd, dayIndex);
+  // Keep selection highlight consistent after rerender
+  if (!selectedYMD) selectDay(ymd(new Date()));
+  else selectDay(selectedYMD, {silent:true});
+}
+
+function layoutMultiDayBars(events, gridStart, gridEnd, dayIndex){
+  // We position bars relative to the grid element
+  const gridRect = elGrid.getBoundingClientRect();
+  const cellEls = [...elGrid.querySelectorAll(".day")];
+
+  // compute cell geometry dynamically (responsive)
+  function cellRect(idx){
+    return cellEls[idx].getBoundingClientRect();
+  }
+
+  // Build week rows: 0..N-1 each row has 7 days
+  const totalCells = cellEls.length;
+  const rows = Math.ceil(totalCells/7);
+
+  // Track lanes per row to avoid overlaps
+  const lanes = Array.from({length: rows}, () => []); // each lane is array of occupied segments [startCol,endCol]
+
+  // Normalize each event to grid range (inclusive start, exclusive end for all-day)
+  const normalized = events
+    .map(ev => {
+      let s = clampToDay(new Date(ev.start));
+      let e = clampToDay(new Date(ev.end));
+
+      // For non-all-day multi-day, treat end day inclusive-ish by bumping if same-day boundaries are odd
+      // We'll convert to exclusive end day for spanning:
+      if (e.getTime() <= s.getTime()) e = addDays(s, 1);
+
+      // Clamp to grid
+      const gs = clampToDay(gridStart);
+      const ge = clampToDay(gridEnd);
+      if (e <= gs || s >= ge) return null;
+
+      if (s < gs) s = gs;
+      if (e > ge) e = ge;
+
+      return { ...ev, _s: s, _e: e };
+    })
+    .filter(Boolean)
+    .sort((a,b)=> a._s - b._s);
+
+  for (const ev of normalized){
+    // Build spans across rows. We treat _e as exclusive end (day not included)
+    const startKey = ymd(ev._s);
+    const endKeyExclusive = ymd(ev._e);
+
+    const startIdx = dayIndex.get(startKey);
+    const endIdxEx = dayIndex.get(endKeyExclusive);
+    if (startIdx == null) continue;
+    let endEx = (endIdxEx == null ? startIdx+1 : endIdxEx);
+
+    // Walk row by row
+    let cursor = startIdx;
+    while (cursor < endEx){
+      const row = Math.floor(cursor/7);
+      const rowStart = row*7;
+      const rowEndEx = rowStart + 7;
+
+      const segStart = cursor;
+      const segEndEx = Math.min(endEx, rowEndEx);
+
+      const startCol = segStart - rowStart;
+      const endCol = (segEndEx - rowStart) - 1;
+
+      // pick first lane in this row that doesn't overlap
+      const laneIndex = pickLane(lanes[row], startCol, endCol);
+
+      // mark occupancy
+      lanes[row][laneIndex].push([startCol, endCol]);
+
+      // Position bar using actual DOM cell rects
+      const leftCell = cellRect(segStart);
+      const rightCell = cellRect(segEndEx - 1);
+
+      const topWithinRow = 34 + laneIndex * 22; // inside cell area (below day number)
+      const top = (leftCell.top - gridRect.top) + topWithinRow;
+      const left = (leftCell.left - gridRect.left) + 10;
+      const right = (rightCell.right - gridRect.left) - 10;
+      const width = Math.max(60, right - left);
+
+      const bar = document.createElement("div");
+      bar.className = "bar" + (ev.source==="holiday" ? " holiday" : "");
+      bar.style.top = `${top}px`;
+      bar.style.left = `${left}px`;
+      bar.style.width = `${width}px`;
+
+      const startsHere = segStart === startIdx;
+      const endsHere = segEndEx === endEx;
+
+      const cap = (startsHere ? "◀︎" : "…") + " " + escapeHtml(ev.title) + " " + (endsHere ? "▶︎" : "…");
+
+      bar.innerHTML = `<div style="overflow:hidden;text-overflow:ellipsis">${cap}</div>
+                       <div class="tiny">${ev.source==="holiday" ? "Holiday" : (ev.allDay ? "All-day" : "")}</div>`;
+
+      bar.addEventListener("click", (e) => {
+        e.stopPropagation();
+        // Select the start day of the event for journaling context
+        selectDay(ymd(ev._s));
+      });
+
+      elBars.appendChild(bar);
+
+      cursor = segEndEx;
+    }
+  }
+
+  function pickLane(rowLanes, startCol, endCol){
+    // rowLanes: array of lane arrays
+    for (let i=0; i<rowLanes.length; i++){
+      if (!overlapsAny(rowLanes[i], startCol, endCol)){
+        return i;
+      }
+    }
+    rowLanes.push([]); // new lane
+    return rowLanes.length - 1;
+  }
+
+  function overlapsAny(segments, s, e){
+    for (const [a,b] of segments){
+      const overlap = !(e < a || s > b);
+      if (overlap) return true;
+    }
+    return false;
+  }
+}
+
+/** ====== JOURNAL (localStorage) ====== **/
+function journalKey(dayYMD){
+  return `journal:v1:${dayYMD}`;
+}
+function selectDay(dayYMD, opts={}){
+  selectedYMD = dayYMD;
+
+  // highlight cell
+  [...elGrid.querySelectorAll(".day")].forEach(d => d.classList.toggle("selected", d.dataset.ymd === dayYMD));
+
+  const d = parseYMD(dayYMD);
+  const pretty = d.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric", year:"numeric" });
+  selectedDateLabel.textContent = pretty.toUpperCase();
+
+  // load note
+  journalText.value = localStorage.getItem(journalKey(dayYMD)) || "";
+
+  // meta: number of events that day (for month-merged)
+  selectedMeta.textContent = dayMeta(dayYMD);
+
+  if (!opts.silent){
+    // If on small screens, scroll the journal into view after selection
+    if (window.innerWidth < 980){
+      selectedDateLabel.scrollIntoView({behavior:"smooth", block:"nearest"});
+    }
+  }
+}
+
+function dayMeta(dayYMD){
+  const includeHol = holMonthToggle.checked;
+  const merged = [
+    ...primaryEvents,
+    ...(includeHol ? holidayEvents : []),
+  ];
+
+  // Count events that start on this day OR multi-day spans that cover this day
+  const dayStart = parseYMD(dayYMD);
+  const dayEnd = addDays(dayStart, 1);
+
+  let count = 0;
+  for (const ev of merged){
+    const s = new Date(ev.start);
+    const e = new Date(ev.end);
+
+    // treat all-day end as exclusive; timed end is as-given
+    const overlaps = (s < dayEnd) && (e > dayStart);
+    if (overlaps) count++;
+  }
+  return count === 1 ? "1 event" : `${count} events`;
+}
+
+/** ====== RENDER ====== **/
+function render(){
+  renderUpcoming();
+  renderMonthGrid();
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/** ====== LOAD DATA ====== **/
+async function load(){
+  buildMonthTabs();
+  elStatus.textContent = "Loading calendars…";
+
+  try{
+    const [primaryText, holidayText] = await Promise.all([
+      fetch(safeFetchUrl(PRIMARY_ICS_URL)).then(r => {
+        if (!r.ok) throw new Error("Primary calendar fetch failed");
+        return r.text();
+      }),
+      fetch(safeFetchUrl(US_HOLIDAYS_ICS_URL)).then(r => {
+        if (!r.ok) throw new Error("Holiday calendar fetch failed");
+        return r.text();
+      }),
+    ]);
+
+    primaryEvents = parseICS(primaryText, "primary").sort((a,b)=> startMs(a)-startMs(b));
+    holidayEvents = parseICS(holidayText, "holiday").sort((a,b)=> startMs(a)-startMs(b));
+
+    elStatus.textContent = `Loaded ${primaryEvents.length} events + ${holidayEvents.length} holidays.`;
+
+    // Default selected day: today
+    selectedYMD = ymd(new Date());
+    render();
+
+    // Re-layout bars on resize (since we use DOM rects)
+    window.addEventListener("resize", debounce(() => {
+      // rerender month only (keeps selected)
+      renderMonthGrid();
+    }, 150));
+
+  } catch (e){
+    console.error(e);
+    elStatus.textContent =
+      "Could not load calendar data. If this is on GitHub Pages, it may be CORS. " +
+      "Leave USE_CORS_PROXY=true (default) or use a different proxy.";
+    elUpcoming.innerHTML = `<div class="upcomingItem"><div class="upcomingWhen">Error</div><div class="upcomingTitle">Calendar could not be loaded</div></div>`;
+  }
+}
+
+function debounce(fn, ms){
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), ms);
+  };
+}
+
+load();
+</script>
+</body>
+</html>
