@@ -14,7 +14,7 @@
       --cardA:rgba(255,255,255,.04);
       --cardB:rgba(255,255,255,.02);
 
-      /* Month palette */
+      /* Month palette (matches tabs) */
       --tab1:#1d4ed8; --tab2:#0ea5e9; --tab3:#22c55e; --tab4:#94a3b8;
       --tab5:#f59e0b; --tab6:#fb7185; --tab7:#a78bfa; --tab8:#60a5fa;
       --tab9:#34d399; --tab10:#f97316; --tab11:#f43f5e; --tab12:#eab308;
@@ -38,6 +38,7 @@
         var(--bg);
       color:var(--text);
       font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      overflow-x:hidden;
     }
 
     /* ===== TOP ===== */
@@ -46,14 +47,25 @@
       justify-content:space-between;
       align-items:flex-end;
       padding:22px 22px 10px;
-      gap:12px;
+      gap:14px;
       flex-wrap:wrap;
     }
+    .brand{min-width:240px}
     .title{font-size:22px; letter-spacing:.06em; text-transform:uppercase}
     .subtitle{color:var(--muted); font-size:12px; margin-top:4px}
 
+    .rightControls{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      max-width:100%;
+    }
+
     .nav{
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      max-width:100%;
     }
     .nav button{
       width:40px; height:40px;
@@ -63,23 +75,19 @@
       border-radius:12px;
       font-size:20px;
       cursor:pointer;
+      flex:0 0 auto;
     }
     .nav button:hover{background:rgba(255,255,255,.07)}
     .monthLabel{
       min-width:200px;
       text-align:center;
-      font-weight:600;
+      font-weight:700;
       letter-spacing:.06em;
       text-transform:uppercase;
       color:rgba(232,237,244,.92);
+      flex:0 1 auto;
     }
 
-    .actionBtns{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
     .pillBtn{
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.04);
@@ -90,19 +98,20 @@
       font-size:12px;
       letter-spacing:.08em;
       text-transform:uppercase;
-      font-weight:800;
+      font-weight:900;
       display:inline-flex;
       align-items:center;
       gap:8px;
-      text-decoration:none;
       user-select:none;
       white-space:nowrap;
+      flex:0 0 auto;
     }
     .pillBtn:hover{background:rgba(255,255,255,.07)}
     .pillDot{
       width:10px; height:10px; border-radius:50%;
       background:var(--accent);
       box-shadow:0 0 0 4px rgba(255,255,255,.06);
+      flex:0 0 auto;
     }
 
     /* ===== UPCOMING ===== */
@@ -137,6 +146,7 @@
       color:rgba(232,237,244,.85);
       font-size:12px;
       user-select:none;
+      flex-wrap:wrap;
     }
     .toggles label{
       display:flex;
@@ -147,20 +157,26 @@
       padding:6px 10px;
       border-radius:999px;
       cursor:pointer;
+      white-space:nowrap;
     }
+
     .upcomingList{
       display:flex;
       gap:10px;
-      overflow:auto;
-      padding-bottom:4px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding-bottom:6px;
       scroll-snap-type:x mandatory;
       scrollbar-width:thin;
+      max-width:100%;
     }
     .upcomingList::-webkit-scrollbar{height:8px}
     .upcomingList::-webkit-scrollbar-thumb{
       background:rgba(255,255,255,.12);
       border-radius:999px;
     }
+
+    /* Per-event month accent uses --itemAccent set inline by JS */
     .upcomingItem{
       scroll-snap-align:start;
       min-width:240px;
@@ -168,10 +184,12 @@
       background:rgba(255,255,255,.04);
       border-radius:16px;
       padding:10px 12px;
-      outline:1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+      outline:1px solid color-mix(in oklab, var(--itemAccent, var(--accent)) 55%, transparent);
+      box-shadow:0 14px 30px rgba(0,0,0,.25);
+      flex:0 0 auto;
     }
     .upcomingWhen{color:var(--muted); font-size:12px}
-    .upcomingTitle{margin-top:6px; font-weight:600; font-size:14px; line-height:1.2}
+    .upcomingTitle{margin-top:6px; font-weight:700; font-size:14px; line-height:1.2}
     .badge{
       display:inline-block;
       margin-top:8px;
@@ -207,7 +225,7 @@
       .layout{grid-template-columns:1fr}
     }
 
-    /* ====== CARDS (color-coded outline) ====== */
+    /* ====== CARDS (month-coded outline via --accent) ====== */
     .calendarCard,
     .panel{
       border-radius:22px;
@@ -257,7 +275,7 @@
     .dayNum{
       color:rgba(232,237,244,.92);
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.06em;
     }
     .dayNum.muted{color:rgba(138,147,160,.70)}
@@ -353,7 +371,7 @@
     .panelMeta{
       font-size:12px;
       color:rgba(232,237,244,.85);
-      font-weight:700;
+      font-weight:800;
     }
     .panelBody{padding:14px}
 
@@ -458,17 +476,28 @@
     }
     code{color:rgba(232,237,244,.85)}
 
-    /* ===== PRINT (Save as PDF) ===== */
+    /* ===== PRINT (Save as PDF) =====
+       Fix: ensure sheet is sized to page and not off-screen.
+    */
     #printSheet{
       display:none;
       color:#000;
       background:#fff;
-      padding:0;
+      width:100%;
+      height:auto;
     }
     #printSheet .pwrap{
-      padding:0.35in;
+      width:100%;
+      max-width:100%;
+      padding:0; /* @page margin handles it */
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
+    #printSheet .pinner{
+      width:100%;
+      max-width:100%;
+      padding:0;
+    }
+
     #printSheet h1{
       margin:0 0 10px 0;
       font-size:16px;
@@ -481,42 +510,51 @@
       gap:12px;
       font-size:11px;
       margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    #printSheet .pdow{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom:4px;
+      font-weight:800;
+      font-size:10px;
+      width:100%;
     }
     #printSheet .pgrid{
       display:grid;
       grid-template-columns: repeat(7, 1fr);
       border:1px solid #333;
       font-size:10px;
-    }
-    #printSheet .pdow{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      margin-bottom:4px;
-      font-weight:700;
-      font-size:10px;
+      width:100%;
+      max-width:100%;
     }
     #printSheet .pcell{
-      min-height:0.9in;
+      min-height:0.82in;
       border-right:1px solid #333;
       border-bottom:1px solid #333;
       padding:6px;
-      position:relative;
       overflow:hidden;
     }
     #printSheet .pcell:nth-child(7n){border-right:none}
-    #printSheet .pnum{font-weight:800; font-size:10px}
+    #printSheet .pnum{font-weight:900; font-size:10px}
     #printSheet .pevt{margin-top:4px; font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
     #printSheet .psectionRow{
       display:grid;
-      grid-template-columns: 1.25fr 1fr;
+      grid-template-columns: 1.3fr 1fr;
       gap:12px;
       margin-top:10px;
       align-items:start;
+      width:100%;
+      max-width:100%;
     }
     #printSheet .pbox{
       border:1px solid #333;
       padding:8px;
       border-radius:8px;
+      width:100%;
+      max-width:100%;
+      overflow:hidden;
     }
     #printSheet .pbox h2{
       margin:0 0 8px 0;
@@ -529,26 +567,28 @@
       margin-bottom:6px;
     }
     #printSheet .pupWhen{
-      font-weight:700;
+      font-weight:800;
     }
     #printSheet .pjItem{
       font-size:10px;
       margin-bottom:8px;
     }
     #printSheet .pjDate{
-      font-weight:800;
+      font-weight:900;
     }
     #printSheet .pjText{
       margin-top:3px;
       white-space:pre-wrap;
-      max-height:0.5in;
+      max-height:0.55in;
       overflow:hidden;
     }
 
     @media print{
-      @page { size: letter landscape; margin: 0; }
+      @page { size: letter landscape; margin: 0.35in; }
+      html,body{height:auto !important;}
       body > *:not(#printSheet){ display:none !important; }
       #printSheet{ display:block !important; }
+      #printSheet .pwrap{ display:block; }
     }
   </style>
 </head>
@@ -560,21 +600,17 @@
       <div class="subtitle">month tabs · multiday bars · journal dots · print-to-PDF</div>
     </div>
 
-    <div class="nav">
-      <button id="prevBtn" aria-label="Previous month">‹</button>
-      <div id="monthLabel" class="monthLabel"></div>
-      <button id="nextBtn" aria-label="Next month">›</button>
-
-      <div class="actionBtns">
-        <a id="runActionBtn" class="pillBtn" href="#" target="_blank" rel="noopener">
-          <span class="pillDot"></span>
-          Run GitHub Action
-        </a>
-        <button id="printBtn" class="pillBtn" type="button">
-          <span class="pillDot"></span>
-          Print / Save PDF
-        </button>
+    <div class="rightControls">
+      <div class="nav">
+        <button id="prevBtn" aria-label="Previous month">‹</button>
+        <div id="monthLabel" class="monthLabel"></div>
+        <button id="nextBtn" aria-label="Next month">›</button>
       </div>
+
+      <button id="printBtn" class="pillBtn" type="button">
+        <span class="pillDot"></span>
+        Print / Save PDF
+      </button>
     </div>
   </header>
 
@@ -637,7 +673,7 @@
           <div class="panelBody">
             <div class="hint">
               This page loads local mirrored feeds: <code>./data/primary.ics</code> and <code>./data/holidays.ics</code>.
-              A GitHub Action refreshes those. The “Run GitHub Action” button opens the workflow page (you must be logged in).
+              A GitHub Action refreshes those (run it from your repo Actions tab when needed).
             </div>
           </div>
         </section>
@@ -645,28 +681,30 @@
     </div>
   </main>
 
-  <!-- PRINT SHEET (rendered on-demand, printed as letter landscape; user chooses Save as PDF) -->
+  <!-- PRINT SHEET -->
   <section id="printSheet" aria-hidden="true">
     <div class="pwrap">
-      <h1 id="pTitle">Monthly Journal</h1>
-      <div class="pmeta">
-        <div id="pMonth"></div>
-        <div id="pGenerated"></div>
-      </div>
-
-      <div class="pdow">
-        <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
-      </div>
-      <div id="pGrid" class="pgrid"></div>
-
-      <div class="psectionRow">
-        <div class="pbox">
-          <h2>Upcoming</h2>
-          <div id="pUpcoming"></div>
+      <div class="pinner">
+        <h1 id="pTitle">Monthly Journal</h1>
+        <div class="pmeta">
+          <div id="pMonth"></div>
+          <div id="pGenerated"></div>
         </div>
-        <div class="pbox">
-          <h2>Journal entries</h2>
-          <div id="pJournal"></div>
+
+        <div class="pdow">
+          <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+        </div>
+        <div id="pGrid" class="pgrid"></div>
+
+        <div class="psectionRow">
+          <div class="pbox">
+            <h2>Upcoming</h2>
+            <div id="pUpcoming"></div>
+          </div>
+          <div class="pbox">
+            <h2>Journal entries</h2>
+            <div id="pJournal"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -682,8 +720,8 @@ const PRIMARY_ICS_URL = "./data/primary.ics";
 const HOLIDAYS_ICS_URL = "./data/holidays.ics";
 
 /** Upcoming behavior */
-const UPCOMING_PIN_COUNT = 5;          // "Top" pinned list (first 5)
-const UPCOMING_SCROLL_COUNT = 30;      // Render more so you can scroll further out
+const UPCOMING_PIN_COUNT = 5;          // first 5 are marked TOP
+const UPCOMING_SCROLL_COUNT = 40;      // render more so horizontal scroll goes further out
 
 /** Month grid chips */
 const MAX_DAY_CHIPS = 3;
@@ -709,7 +747,6 @@ const saveBtn = document.getElementById("saveBtn");
 const clearBtn = document.getElementById("clearBtn");
 
 const printBtn = document.getElementById("printBtn");
-const runActionBtn = document.getElementById("runActionBtn");
 
 const pMonth = document.getElementById("pMonth");
 const pGenerated = document.getElementById("pGenerated");
@@ -723,19 +760,6 @@ let primaryEvents = [];
 let holidayEvents = [];
 let selectedYMD = null;
 
-/** ===== GitHub Action “Run” button =====
- * NOTE: A static GitHub Pages site cannot programmatically trigger a workflow_dispatch without authentication.
- * This button opens the workflow page where you can click “Run workflow”.
- *
- * Replace placeholders:
- *  - <OWNER>, <REPO>, <WORKFLOW_FILE>
- */
-const GITHUB_OWNER = "<OWNER>";
-const GITHUB_REPO = "<REPO>";
-const WORKFLOW_FILE = "fetch-ical.yml"; // must match the filename in .github/workflows/
-const actionsUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/actions/workflows/${WORKFLOW_FILE}`;
-runActionBtn.href = actionsUrl;
-
 /** ===== Events ===== */
 document.getElementById("prevBtn").addEventListener("click", () => shiftMonth(-1));
 document.getElementById("nextBtn").addEventListener("click", () => shiftMonth(1));
@@ -746,7 +770,6 @@ saveBtn.addEventListener("click", () => {
   if (!selectedYMD) return;
   localStorage.setItem(journalKey(selectedYMD), journalText.value);
   bumpSelectedMeta("Saved");
-  // update journal dots on calendar
   updateJournalDots();
 });
 
@@ -760,9 +783,8 @@ clearBtn.addEventListener("click", () => {
 
 printBtn.addEventListener("click", async () => {
   buildPrintSheet();
-  // Let layout settle for a tick
-  await new Promise(r => setTimeout(r, 50));
-  window.print(); // user chooses "Save as PDF"
+  await new Promise(r => setTimeout(r, 30));
+  window.print();
 });
 
 /** ===== Helpers ===== */
@@ -821,7 +843,7 @@ function debounce(fn, ms){
   };
 }
 
-/** ===== Accent (month color) ===== */
+/** ===== Accent (current month) ===== */
 function setAccentForMonth(monthIdx){
   const map = [
     "var(--tab1)","var(--tab2)","var(--tab3)","var(--tab4)",
@@ -829,6 +851,16 @@ function setAccentForMonth(monthIdx){
     "var(--tab9)","var(--tab10)","var(--tab11)","var(--tab12)",
   ];
   document.documentElement.style.setProperty("--accent", map[monthIdx] || "var(--tab1)");
+}
+
+/** Month color (used for upcoming card outlines per event month) */
+function monthColorVar(monthIdx){
+  const map = [
+    "var(--tab1)","var(--tab2)","var(--tab3)","var(--tab4)",
+    "var(--tab5)","var(--tab6)","var(--tab7)","var(--tab8)",
+    "var(--tab9)","var(--tab10)","var(--tab11)","var(--tab12)",
+  ];
+  return map[monthIdx] || "var(--accent)";
 }
 
 /** ===== ICS parsing ===== */
@@ -931,14 +963,20 @@ function renderUpcoming(){
 
   for (let i=0; i<merged.length; i++){
     const ev = merged[i];
+
     const badge =
       ev.source === "holiday" ? "Holiday" :
       ev.allDay ? "All-day" : "Event";
 
     const item = document.createElement("div");
     item.className = "upcomingItem";
+
+    // ✅ Month-coded outline based on the event’s start month
+    const evMonth = new Date(ev.start).getMonth();
+    item.style.setProperty("--itemAccent", monthColorVar(evMonth));
+
     item.innerHTML = `
-      <div class="upcomingWhen">${fmtUpcomingWhen(ev)}${i < UPCOMING_PIN_COUNT ? " · TOP" : ""}</div>
+      <div class="upcomingWhen">${escapeHtml(fmtUpcomingWhen(ev))}${i < UPCOMING_PIN_COUNT ? " · TOP" : ""}</div>
       <div class="upcomingTitle">${escapeHtml(ev.title)}</div>
       <div class="badge">${badge}</div>
     `;
@@ -1029,7 +1067,6 @@ function renderMonthGrid(){
       cell.appendChild(dot);
     }
 
-    // journal dot if entry exists
     if (hasJournalEntry(key)){
       const jdot = document.createElement("div");
       jdot.className = "journalDot";
@@ -1046,7 +1083,6 @@ function renderMonthGrid(){
     elGrid.appendChild(cell);
   }
 
-  // chips
   const map = buildDayEventMap(singleDay);
   for (const [key, list] of map.entries()){
     const chipsWrap = elGrid.querySelector(`.chips[data-chips-for="${key}"]`);
@@ -1067,10 +1103,8 @@ function renderMonthGrid(){
     }
   }
 
-  // bars
   layoutMultiDayBars(multiday, gridStart, gridEnd, dayIndex);
 
-  // keep selection
   if (!selectedYMD) selectDay(ymd(new Date()));
   else selectDay(selectedYMD, {silent:true});
 }
@@ -1172,14 +1206,13 @@ function layoutMultiDayBars(events, gridStart, gridEnd, dayIndex){
   }
 }
 
-/** ===== Journal (localStorage) + dots ===== */
+/** ===== Journal ===== */
 function journalKey(dayYMD){ return `journal:v1:${dayYMD}`; }
 function hasJournalEntry(dayYMD){
   const v = localStorage.getItem(journalKey(dayYMD));
   return v != null && String(v).trim().length > 0;
 }
 function updateJournalDots(){
-  // update dots for all visible cells
   for (const cell of elGrid.querySelectorAll(".day")){
     const key = cell.dataset.ymd;
     const existing = cell.querySelector(".journalDot");
@@ -1233,13 +1266,11 @@ function dayMeta(dayYMD){
   return count === 1 ? "1 event" : `${count} events`;
 }
 
-/** ===== Print-to-PDF (letter landscape) ===== */
+/** ===== Print ===== */
 function buildPrintSheet(){
-  // Header
   pMonth.textContent = fmtMonthLabel(viewMonth);
   pGenerated.textContent = `Generated: ${new Date().toLocaleString()}`;
 
-  // Build month grid (simple + readable)
   pGrid.innerHTML = "";
 
   const includeHolMonth = holMonthToggle.checked;
@@ -1251,11 +1282,9 @@ function buildPrintSheet(){
   const gridStart = startOfGrid(viewMonth);
   const gridEnd = endOfGrid(viewMonth);
 
-  // Map: date -> list (starts on that day)
   const map = new Map();
   for (const ev of merged){
     const s = clampToDay(new Date(ev.start));
-    // only show events that overlap visible grid range at all (simple filter)
     const e = new Date(ev.end);
     if (e <= gridStart || s >= gridEnd) continue;
 
@@ -1267,7 +1296,6 @@ function buildPrintSheet(){
     list.sort((a,b)=> startMs(a)-startMs(b));
   }
 
-  // Cells
   const monthNum = viewMonth.getMonth();
   let d = new Date(gridStart);
   while (d < gridEnd){
@@ -1292,7 +1320,6 @@ function buildPrintSheet(){
     d.setDate(d.getDate()+1);
   }
 
-  // Upcoming (print top 10 from now, includes holiday toggle based on upcoming toggle)
   pUpcoming.innerHTML = "";
   const includeHolUpcoming = holUpcomingToggle.checked;
   const now = new Date();
@@ -1315,7 +1342,6 @@ function buildPrintSheet(){
     }
   }
 
-  // Journal entries (for the month, top N non-empty)
   pJournal.innerHTML = "";
   const entries = getJournalEntriesForMonth(viewMonth).slice(0, PRINT_JOURNAL_MAX);
   if (entries.length === 0){
@@ -1332,12 +1358,10 @@ function buildPrintSheet(){
 }
 
 function getJournalEntriesForMonth(monthDate){
-  // Collect journal entries in the current month only
   const Y = monthDate.getFullYear();
   const M = monthDate.getMonth();
 
   const entries = [];
-  // Iterate days in month
   let d = new Date(Y, M, 1);
   while (d.getMonth() === M){
     const key = ymd(d);
@@ -1348,18 +1372,16 @@ function getJournalEntriesForMonth(monthDate){
     }
     d.setDate(d.getDate()+1);
   }
-  // Most recent first
   entries.sort((a,b)=> b.ymd.localeCompare(a.ymd));
   return entries;
 }
 
-/** ===== Render ===== */
+/** ===== Render / Load ===== */
 function render(){
   renderUpcoming();
   renderMonthGrid();
 }
 
-/** ===== Load ===== */
 async function load(){
   buildMonthTabs();
   setAccentForMonth(viewMonth.getMonth());
