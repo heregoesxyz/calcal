@@ -1344,7 +1344,8 @@ function debounce(fn, ms){
 
 /** ===== Export (CSV) ===== */
 function exportJournalYearCSV(year){
-  const PREFIX = "journal:";
+  // NOTE: journal entries are stored under keys like: journal:v1:YYYY-MM-DD
+  const PREFIX = "journal:v1:";
   const rows = [];
 
   for (let i = 0; i < localStorage.length; i++){
@@ -1375,7 +1376,9 @@ function exportJournalYearCSV(year){
 
   const lines = ["date,entry"];
   for (const r of rows){
-    lines.push(`${csvEscape(r.date)},${csvEscape(r.text)}`);
+    // Preserve newlines inside CSV cells. (Excel/Sheets handle quoted newlines.)
+    const entry = String(r.text).replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    lines.push(`${csvEscape(r.date)},${csvEscape(entry)}`);
   }
 
   const csv = lines.join("\n");
