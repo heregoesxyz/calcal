@@ -664,6 +664,21 @@
     @media print{
       @page { size: letter portrait; margin: 0.35in; }
 
+      /* High-contrast print theme (ensures legibility even with backgrounds disabled) */
+      :root{
+        --bg:#ffffff;
+        --text:#111111;
+        --muted:#444444;
+        --line:rgba(0,0,0,.18);
+        --cardA:#ffffff;
+        --cardB:#ffffff;
+        --barPrimary:#e5e7eb;
+        --barHoliday:#dbeafe;
+        --barBorder:rgba(0,0,0,.22);
+        --barText:#111111;
+      }
+
+
       html,body{
         height:auto !important;
         overflow:visible !important;
@@ -686,7 +701,9 @@
             /* Never show the legacy placeholder print sheet */
       #printSheet{ display:none !important; }
 
-/* Hide UI controls that don't belong on paper */
+#printSheet{display:none !important;}
+
+      /* Hide UI controls that don't belong on paper */
       #printBtn,
       .nav button,
       .scrollHint,
