@@ -657,450 +657,312 @@
       outline-offset:0;
     }
 
-    
-    /* ===== PRINT ===== */
-    /* Goal: print exactly what you see on screen (no placeholder print sheet). */
-    /* Tip: enable “Background graphics” in the browser print dialog if you want the gradients/colors. */
+    /* ===== PAGE SYSTEM (2 pages) ===== */
+    .page{ display:none; }
+    .page.active{ display:block; }
+
+    /* ===== MOBILE-FRIENDLY UPCOMING FEED PAGE ===== */
+    .feedPage{ padding: 14px 16px 24px; }
+    .feedTopbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .feedTitle{
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:900;
+    }
+    .backBtn{
+      width:40px;height:40px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      border-radius:12px;
+      font-size:18px;
+      cursor:pointer;
+    }
+    .backBtn:hover{ background:rgba(255,255,255,.07); }
+
+    .feedControls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+
+    .feedList{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .feedMonthSep{
+      margin: 12px 0 2px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(232,237,244,.80);
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .feedItem{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      border-radius:18px;
+      padding:12px 12px;
+      outline:1px solid color-mix(in oklab, var(--itemAccent, var(--accent)) 55%, transparent);
+      box-shadow:0 14px 30px rgba(0,0,0,.25);
+    }
+    .feedWhen{ color:var(--muted); font-size:12px; }
+    .feedTitleText{
+      margin-top:6px;
+      font-weight:900;
+      font-size:16px;
+      line-height:1.2;
+      color:rgba(232,237,244,.96);
+    }
+    .feedMetaRow{
+      margin-top:10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .feedBadge{
+      display:inline-block;
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      color:rgba(232,237,244,.85);
+    }
+    .feedJump{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:rgba(232,237,244,.92);
+      padding:6px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-weight:900;
+    }
+    .feedJump:hover{ background:rgba(255,255,255,.07); }
+
+    /* ===== PRINT (kept minimal + valid so CSS doesn't break) ===== */
     @media print{
       @page { size: letter portrait; margin: 0.35in; }
-
-      /* High-contrast print theme (ensures legibility even with backgrounds disabled) */
-      :root{
-        --bg:#ffffff;
-        --text:#111111;
-        --muted:#444444;
-        --line:rgba(0,0,0,.18);
-        --cardA:#ffffff;
-        --cardB:#ffffff;
-        --barPrimary:#e5e7eb;
-        --barHoliday:#dbeafe;
-        --barBorder:rgba(0,0,0,.22);
-        --barText:#111111;
-
-      /* --- Keep desktop two-column layout in print (avoid responsive stacking) --- */
-      .layout{
-        grid-template-columns: minmax(0, 1fr) 360px !important;
-        grid-template-areas:
-          "cal insights"
-          "journal journal" !important;
-
-      /* --- PRINT: layout + margins --- */
-      @page { size: letter portrait; margin: 0.25in; }
-
-      /* Lock to desktop-like width then scale to fit */
-      :root{ --printScale: 0.68; --printBaseWidth: 1120px; }
-
-      .topbar,
-      .container{
-        width: var(--printBaseWidth) !important;
-        max-width: none !important;
-      }
-      .app{
-        transform: scale(var(--printScale)) !important;
-        transform-origin: top left !important;
-        width: var(--printBaseWidth) !important;
-      }
-
-      /* Remove legacy placeholder print sheet */
-      #printSheet{
-        display:none !important;
-        visibility:hidden !important;
-        height:0 !important;
-        overflow:hidden !important;
-      }
-
-      /* Hide header title + subtitle in print */
-      .brand,
-      .brandTitle,
-      .brandSub,
-      .topbar .left h1,
-      .topbar .left .sub,
-      .topbar .left .tagline{
-        display:none !important;
-      }
-
-      /* Hide controls that don't belong on paper */
-      #printBtn,
-      #exportCsvBtn,
-      .nav button,
-      .scrollHint,
-      .status{
-        display:none !important;
-      }
-
-      /* Ensure two-column desktop grid (avoid responsive stacking) */
-      .layout{
-        grid-template-columns: minmax(0, 1fr) 360px !important;
-        grid-template-areas:
-          "cal insights"
-          "journal journal" !important;
-        gap: 12px !important;
-      }
-
-      /* --- Make calendar grid clearly discernable --- */
-      .calendarCard{
-        border-color: rgba(0,0,0,.35) !important;
-      }
-      .dow{
-        color:#111 !important;
-        border-bottom: 1px solid rgba(0,0,0,.35) !important;
-      }
-      .grid{ background:#fff !important; }
-      .day{
-        border-right: 1px solid rgba(0,0,0,.35) !important;
-        border-bottom: 1px solid rgba(0,0,0,.35) !important;
-        background: #fff !important;
-      }
-      .dayNum{ color:#111 !important; }
-      .dayNum.muted{ color:#666 !important; }
-
-      /* Multiday bars/pills readable on white paper */
-      .bar,
-      .pill,
-      .chip,
-      .badge{
-        background: #f2f2f2 !important;
-        color:#111 !important;
-        border:1px solid rgba(0,0,0,.25) !important;
-        box-shadow:none !important;
-      }
-
-      /* Panels / insights visible outlines */
-      .panel,
-      .insightsCard,
-      .calendarCard,
-      .journalCard,
-      .upcomingItem{
-        box-shadow:none !important;
-        background:#fff !important;
-        border-color: rgba(0,0,0,.25) !important;
-      }
-      .panelTitle,
-      .panel h3,
-      .panel h4{ color:#111 !important; }
-      .muted,
-      .meta,
-      .hint,
-      .small{ color:#444 !important; }
-
-      /* Don't clip content */
-      .panelBody,
-      .upcomingList{
-        overflow: visible !important;
-        max-height: none !important;
-      }
-
-      /* --- Journal section: print only month entries list (editor hidden) --- */
-      .journalCard textarea,
-      .journalCard .actions,
-      .journalCard .tip,
-      .journalCard .selectedDayHeader{
-        display:none !important;
-      }
-      #printMonthJournal{
-        display:block !important;
-        border-top: 1px solid rgba(0,0,0,.25) !important;
-        padding-top: 10px !important;
-        margin-top: 10px !important;
-      }
-      #printMonthJournal h2{
-        margin: 0 0 6px !important;
-        font-size: 14px !important;
-        letter-spacing: .06em !important;
-        text-transform: uppercase !important;
-        color:#111 !important;
-      }
-      #printMonthJournal .entry{
-        border: 1px solid rgba(0,0,0,.18) !important;
-        border-radius: 10px !important;
-        padding: 8px 10px !important;
-        margin: 0 0 8px !important;
-        white-space: pre-wrap !important;
-        color:#111 !important;
-        background:#fff !important;
-      }
-      #printMonthJournal .date{
-        font-weight: 800 !important;
-        margin-bottom: 4px !important;
-      }
-      #printMonthJournal .empty{
-        display:block !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: none !important;
-      }
-
+      *{-webkit-print-color-adjust: exact; print-color-adjust: exact;}
+      #printSheet{display:none !important;}
+      #printBtn,#exportCsvBtn,.nav button,.scrollHint,.status,#upcomingPageBtn{display:none !important;}
+      html,body{height:auto !important; overflow:visible !important;}
+      .upcomingSticky{position:static !important; backdrop-filter:none !important;}
+      .panelBody{overflow:visible !important; max-height:none !important;}
+      .upcomingList{overflow:visible !important; flex-wrap:wrap !important; scroll-snap-type:none !important;}
     }
-      /* Print scaling: preserve on-screen positioning, then scale down to fit one portrait page.
-         Adjust --printScale if you want it larger/smaller (0.60–0.78 is typical). */
-      :root{ --printScale: 0.70; --printBaseWidth: 1180px; }
-
-      body{ margin:0 !important; }
-
-      /* Lock the layout to a desktop-like width so the grid doesn't collapse, then scale it */
-      .topbar,
-      .container{
-        width: var(--printBaseWidth) !important;
-        max-width: none !important;
-      }
-
-      /* Scale everything (topbar + upcoming + calendar + insights + journal panel) */
-      .app{
-        transform: scale(var(--printScale)) !important;
-        transform-origin: top left !important;
-        width: var(--printBaseWidth) !important;
-      }
-
-      /* Prevent extra whitespace / clipping after scaling */
-      html, body{
-        overflow: visible !important;
-      }
-
-      /* Never print the legacy placeholder section at the bottom */
-      #printSheet{ display:none !important; }
-
-    }
-      html,body{
-        height:auto !important;
-        overflow:visible !important;
-      }
-
-      /* Preserve colors */
-      *{
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      body{
-        background: #ffffff !important;
-        color:#000000 !important;
-        /* Scale down so the entire dashboard fits on a single Letter portrait page */
-        zoom: 0.72;
-      }
-
-
-            /* Never show the legacy placeholder print sheet */
-      #printSheet{ display:none !important; }
-
-#printSheet{display:none !important;}
-
-      /* Hide UI controls that don't belong on paper */
-      #printBtn,
-      #exportCsvBtn,
-      .nav button,
-      .scrollHint,
-      .status{
-        display:none !important;
-      }
-
-      /* Sticky sections should become normal flow in print */
-      .topbar{
-        position:static !important;
-        padding: 0 0 10px !important;
-      }
-      .upcomingSticky{
-        position:static !important;
-        top:auto !important;
-        z-index:auto !important;
-        backdrop-filter:none !important;
-        background: transparent !important;
-        border-top:1px solid rgba(0,0,0,.12) !important;
-        border-bottom:1px solid rgba(0,0,0,.12) !important;
-        padding: 10px 0 12px !important;
-      }
-
-      /* Remove heavy shadows for sharper print */
-      .calendarCard,
-      .panel,
-      .upcomingItem{
-        box-shadow:none !important;
-      }
-
-      /* Ensure scroll containers expand so nothing is clipped */
-      .panelBody{
-        overflow:visible !important;
-        max-height:none !important;
-      }
-      .upcomingList{
-        overflow:visible !important;
-        flex-wrap:wrap !important;
-        scroll-snap-type:none !important;
-      }
-      .upcomingItem{
-        min-width: 220px !important;
-      }
-
-      /* Tighten overall spacing for letter landscape */
-      .container{ padding: 10px 0 0 !important; }
-      .layout{ gap: 12px !important; }
-
-      /* Make textareas print their current content cleanly */
-      textarea{
-        background: #ffffff !important;
-        color:#000000 !important;
-        border-color: rgba(0,0,0,.25) !important;
-      }
-    }
-
   </style>
 </head>
 
 <body>
   <div class="app">
-  <header class="topbar">
-    <div class="brand">
-      <div class="title">Monthly Journal</div>
-      <div class="subtitle">month tabs · multiday bars · journal dots · insights</div>
-    </div>
 
-    <div class="rightControls">
-      <div class="nav">
-        <button id="prevBtn" aria-label="Previous month">‹</button>
-        <div id="monthLabel" class="monthLabel"></div>
-        <button id="nextBtn" aria-label="Next month">›</button>
+    <!-- PAGE 1 (your existing dashboard) -->
+    <section id="pageMain" class="page active">
+
+      <header class="topbar">
+        <div class="brand">
+          <div class="title">Monthly Journal</div>
+          <div class="subtitle">month tabs · multiday bars · journal dots · insights</div>
+        </div>
+
+        <div class="rightControls">
+          <div class="nav">
+            <button id="prevBtn" aria-label="Previous month">‹</button>
+            <div id="monthLabel" class="monthLabel"></div>
+            <button id="nextBtn" aria-label="Next month">›</button>
+          </div>
+
+          <button id="printBtn" class="pillBtn" type="button">
+            <span class="pillDot"></span>
+            Print / Save PDF
+          </button>
+
+          <button id="upcomingPageBtn" class="pillBtn" type="button" title="Mobile-friendly Upcoming Feed">
+            <span class="pillDot"></span>
+            Upcoming Feed
+          </button>
+        </div>
+      </header>
+
+      <section class="upcomingSticky">
+        <div class="upcomingRow">
+          <div class="upcomingHeader">Upcoming</div>
+          <div class="toggles" title="Toggle holiday visibility">
+            <label><input id="holUpcoming" type="checkbox" /> Holidays in upcoming</label>
+            <label><input id="holMonth" type="checkbox" checked /> Holidays in month</label>
+          </div>
+        </div>
+        <div id="upcomingList" class="upcomingList"></div>
+        <div class="scrollHint">Scroll → to view more upcoming events</div>
+      </section>
+
+      <div id="status" class="status"></div>
+
+      <main class="container">
+        <div class="layout">
+          <!-- CALENDAR -->
+          <section class="calendarCard">
+            <div class="dow">
+              <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+            </div>
+
+            <div id="monthTabs" class="monthTabs" aria-label="Month tabs"></div>
+
+            <div class="gridWrap" id="gridWrap">
+              <div id="barsLayer" class="barsLayer"></div>
+              <div id="grid" class="grid"></div>
+            </div>
+          </section>
+
+          <!-- INSIGHTS -->
+          <section class="panel insightsPanel">
+            <div class="panelHead">
+              <div class="panelTitle">Insights</div>
+              <div id="insightsMeta" class="panelMeta">Year view</div>
+            </div>
+            <div class="panelBody">
+              <div class="miniGrid">
+                <div class="tile">
+                  <div class="tileLabel">Journal entries (month)</div>
+                  <div id="tileEntriesMonth" class="tileValue">0</div>
+                  <div id="tileEntriesMonthSub" class="tileSub">—</div>
+                </div>
+                <div class="tile">
+                  <div class="tileLabel">Current streak</div>
+                  <div id="tileStreak" class="tileValue">0</div>
+                  <div id="tileStreakSub" class="tileSub">days</div>
+                </div>
+                <div class="tile">
+                  <div class="tileLabel">Longest streak</div>
+                  <div id="tileLongest" class="tileValue">0</div>
+                  <div id="tileLongestSub" class="tileSub">days</div>
+                </div>
+                <div class="tile">
+                  <div class="tileLabel">Events (month)</div>
+                  <div id="tileEventsMonth" class="tileValue">0</div>
+                  <div id="tileEventsMonthSub" class="tileSub">incl. filters</div>
+                </div>
+              </div>
+
+              <div class="insControls">
+                <div class="left">
+                  <label class="chipToggle"><input id="insIncludeHolidays" type="checkbox" /> Include holidays</label>
+                  <label class="chipToggle"><input id="insOverlayJournal" type="checkbox" checked /> Journal line overlay</label>
+                </div>
+                <div style="color:rgba(232,237,244,.75);font-size:12px">Year: <span id="insYear"></span></div>
+              </div>
+
+              <div class="canvasWrap">
+                <canvas id="yearChart" width="720" height="220"></canvas>
+                <div class="caption">
+                  Bars: events per month. Optional line: journal entries per month.
+                </div>
+              </div>
+
+              <div class="heatWrap">
+                <div class="heatHeader">
+                  <div class="heatTitle">Daily activity (current month)</div>
+                  <div id="heatLegend" class="heatLegend"></div>
+                </div>
+                <div id="heatGrid" class="heatGrid"></div>
+                <div class="caption" style="margin-top:10px">
+                  Tip: darker = more items. Dot = journal entry.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- JOURNAL -->
+          <section class="panel journalPanel">
+            <div class="panelHead">
+              <div class="panelTitle">Selected day</div>
+              <div id="selectedMeta" class="panelMeta">—</div>
+            </div>
+            <div class="panelBody" style="overflow:visible">
+              <div class="journalGrid">
+                <div class="journalLeft">
+                  <h3 id="selectedDateLabel">Click a day</h3>
+                  <div class="meta">
+                    Journal entries are stored in <code>localStorage</code> on this device/browser only.
+                    Days with notes get a colored dot in the calendar.
+                  </div>
+                </div>
+
+                <div class="journalRight">
+                  <textarea id="journalText" placeholder="Write a journal entry… (saved locally)"></textarea>
+
+                  <div id="printMonthJournal" aria-hidden="true"></div>
+
+                  <div class="btnRow">
+                    <button id="saveBtn" class="btn" type="button">Save</button>
+                    <button id="clearBtn" class="btn" type="button">Clear</button>
+                    <button id="exportCsvBtn" class="btn" type="button" title="Download all journal entries for this year as CSV">Export Year (CSV)</button>
+                  </div>
+                  <div class="hint">
+                    Tip: Click any day in the calendar (or the heat strip) to jump and write.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <!-- PRINT SHEET placeholder -->
+      <section id="printSheet" aria-hidden="true">
+        <div class="pwrap">
+          <h1>Monthly Journal</h1>
+          <p>Use the browser print dialog → Save as PDF.</p>
+        </div>
+      </section>
+
+    </section>
+
+    <!-- PAGE 2 (mobile-friendly upcoming feed) -->
+    <section id="pageUpcomingFeed" class="page">
+      <div class="feedPage">
+        <div class="feedTopbar">
+          <button id="feedBackBtn" class="backBtn" type="button" aria-label="Back">‹</button>
+          <div class="feedTitle">Upcoming feed</div>
+          <div style="width:40px;height:40px"></div>
+        </div>
+
+        <div class="feedControls">
+          <div class="toggles">
+            <label><input id="holUpcomingFeed" type="checkbox" /> Holidays in feed</label>
+          </div>
+          <div style="color:rgba(232,237,244,.75);font-size:12px">Sorted: soonest → latest</div>
+        </div>
+
+        <div id="upcomingFeedList" class="feedList"></div>
       </div>
+    </section>
 
-      <button id="printBtn" class="pillBtn" type="button">
-        <span class="pillDot"></span>
-        Print / Save PDF
-      </button>
-    </div>
-  </header>
-
-  <section class="upcomingSticky">
-    <div class="upcomingRow">
-      <div class="upcomingHeader">Upcoming</div>
-      <div class="toggles" title="Toggle holiday visibility">
-        <label><input id="holUpcoming" type="checkbox" /> Holidays in upcoming</label>
-        <label><input id="holMonth" type="checkbox" checked /> Holidays in month</label>
-      </div>
-    </div>
-    <div id="upcomingList" class="upcomingList"></div>
-    <div class="scrollHint">Scroll → to view more upcoming events</div>
-  </section>
-
-  <div id="status" class="status"></div>
-
-  <main class="container">
-    <div class="layout">
-      <!-- CALENDAR -->
-      <section class="calendarCard">
-        <div class="dow">
-          <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
-        </div>
-
-        <div id="monthTabs" class="monthTabs" aria-label="Month tabs"></div>
-
-        <div class="gridWrap" id="gridWrap">
-          <div id="barsLayer" class="barsLayer"></div>
-          <div id="grid" class="grid"></div>
-        </div>
-      </section>
-
-      <!-- INSIGHTS (RIGHT, MATCHES CALENDAR HEIGHT; SCROLLS INSIDE) -->
-      <section class="panel insightsPanel">
-        <div class="panelHead">
-          <div class="panelTitle">Insights</div>
-          <div id="insightsMeta" class="panelMeta">Year view</div>
-        </div>
-        <div class="panelBody">
-          <div class="miniGrid">
-            <div class="tile">
-              <div class="tileLabel">Journal entries (month)</div>
-              <div id="tileEntriesMonth" class="tileValue">0</div>
-              <div id="tileEntriesMonthSub" class="tileSub">—</div>
-            </div>
-            <div class="tile">
-              <div class="tileLabel">Current streak</div>
-              <div id="tileStreak" class="tileValue">0</div>
-              <div id="tileStreakSub" class="tileSub">days</div>
-            </div>
-            <div class="tile">
-              <div class="tileLabel">Longest streak</div>
-              <div id="tileLongest" class="tileValue">0</div>
-              <div id="tileLongestSub" class="tileSub">days</div>
-            </div>
-            <div class="tile">
-              <div class="tileLabel">Events (month)</div>
-              <div id="tileEventsMonth" class="tileValue">0</div>
-              <div id="tileEventsMonthSub" class="tileSub">incl. filters</div>
-            </div>
-          </div>
-
-          <div class="insControls">
-            <div class="left">
-              <label class="chipToggle"><input id="insIncludeHolidays" type="checkbox" /> Include holidays</label>
-              <label class="chipToggle"><input id="insOverlayJournal" type="checkbox" checked /> Journal line overlay</label>
-            </div>
-            <div style="color:rgba(232,237,244,.75);font-size:12px">Year: <span id="insYear"></span></div>
-          </div>
-
-          <div class="canvasWrap">
-            <canvas id="yearChart" width="720" height="220"></canvas>
-            <div class="caption">
-              Bars: events per month. Optional line: journal entries per month.
-            </div>
-          </div>
-
-          <div class="heatWrap">
-            <div class="heatHeader">
-              <div class="heatTitle">Daily activity (current month)</div>
-              <div id="heatLegend" class="heatLegend"></div>
-            </div>
-            <div id="heatGrid" class="heatGrid"></div>
-            <div class="caption" style="margin-top:10px">
-              Tip: darker = more items. Dot = journal entry.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- JOURNAL (BOTTOM, FULL WIDTH) -->
-      <section class="panel journalPanel">
-        <div class="panelHead">
-          <div class="panelTitle">Selected day</div>
-          <div id="selectedMeta" class="panelMeta">—</div>
-        </div>
-        <div class="panelBody" style="overflow:visible">
-          <div class="journalGrid">
-            <div class="journalLeft">
-              <h3 id="selectedDateLabel">Click a day</h3>
-              <div class="meta">
-                Journal entries are stored in <code>localStorage</code> on this device/browser only.
-                Days with notes get a colored dot in the calendar.
-              </div>
-            </div>
-
-            <div class="journalRight">
-              <textarea id="journalText" placeholder="Write a journal entry… (saved locally)"></textarea>
-
-        <div id=\"printMonthJournal\" aria-hidden=\"true\"></div>
-              <div class="btnRow">
-                <button id="saveBtn" class="btn" type="button">Save</button>
-                <button id="clearBtn" class="btn" type="button">Clear</button>
-                <button id="exportCsvBtn" class="btn" type="button" title="Download all journal entries for this year as CSV">Export Year (CSV)</button>
-              </div>
-              <div class="hint">
-                Tip: Click any day in the calendar (or the heat strip) to jump and write.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <!-- PRINT SHEET placeholder -->
-  <section id="printSheet" aria-hidden="true">
-    <div class="pwrap">
-      <h1>Monthly Journal</h1>
-      <p>Use the browser print dialog → Save as PDF.</p>
-    </div>
-  </section>
-
-</div>
-
+  </div>
 
 <script>
 /** ===== FEEDS (local mirrored, no CORS) ===== */
@@ -1151,16 +1013,51 @@ const yearChart = document.getElementById("yearChart");
 const heatGrid = document.getElementById("heatGrid");
 const heatLegend = document.getElementById("heatLegend");
 
+/* ===== Page 2 DOM ===== */
+const upcomingPageBtn = document.getElementById("upcomingPageBtn");
+const pageMain = document.getElementById("pageMain");
+const pageUpcomingFeed = document.getElementById("pageUpcomingFeed");
+const feedBackBtn = document.getElementById("feedBackBtn");
+const upcomingFeedList = document.getElementById("upcomingFeedList");
+const holUpcomingFeedToggle = document.getElementById("holUpcomingFeed");
+
 /** ===== State ===== */
 let viewMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let primaryEvents = [];
 let holidayEvents = [];
 let selectedYMD = null;
 
+/** ===== Page switching ===== */
+function showPage(which){
+  const isMain = which === "main";
+  pageMain.classList.toggle("active", isMain);
+  pageUpcomingFeed.classList.toggle("active", !isMain);
+
+  if (!isMain){
+    holUpcomingFeedToggle.checked = holUpcomingToggle.checked;
+    renderUpcomingFeed();
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+}
+
+upcomingPageBtn.addEventListener("click", () => showPage("feed"));
+feedBackBtn.addEventListener("click", () => showPage("main"));
+
+holUpcomingFeedToggle.addEventListener("change", () => {
+  holUpcomingToggle.checked = holUpcomingFeedToggle.checked;
+  renderUpcoming();
+  renderUpcomingFeed();
+});
+
 /** ===== Events ===== */
 document.getElementById("prevBtn").addEventListener("click", () => shiftMonth(-1));
 document.getElementById("nextBtn").addEventListener("click", () => shiftMonth(1));
-holUpcomingToggle.addEventListener("change", render);
+
+holUpcomingToggle.addEventListener("change", () => {
+  holUpcomingFeedToggle.checked = holUpcomingToggle.checked;
+  render();
+  if (pageUpcomingFeed.classList.contains("active")) renderUpcomingFeed();
+});
 holMonthToggle.addEventListener("change", () => { render(); });
 
 saveBtn.addEventListener("click", () => {
@@ -1183,104 +1080,12 @@ exportCsvBtn.addEventListener("click", () => {
   exportJournalYearCSV(viewMonth.getFullYear());
 });
 
-
-
-function buildPrintMonthJournal(){
-  const host = document.getElementById("printMonthJournal");
-  if(!host) return;
-
-  let y = (typeof shownYear !== "undefined") ? shownYear : null;
-  let m = (typeof shownMonthIndex !== "undefined") ? shownMonthIndex : null; // 0-based
-
-  if(y == null || m == null){
-    const label = document.querySelector(".monthLabel")?.textContent?.trim() || "";
-    const parts = label.split(/\s+/);
-    if(parts.length >= 2){
-      const monthName = parts[0].toLowerCase();
-      const yearNum = parseInt(parts[1], 10);
-      const months = ["january","february","march","april","may","june","july","august","september","october","november","december"];
-      const mi = months.indexOf(monthName);
-      if(mi >= 0 && !Number.isNaN(yearNum)){ m = mi; y = yearNum; }
-    }
-  }
-
-  if(y == null || m == null){ host.innerHTML = ""; return; }
-
-  const prefix = "journal:";
-  const entries = [];
-  for(let i=0;i<localStorage.length;i++){
-    const k = localStorage.key(i);
-    if(!k || !k.startsWith(prefix)) continue;
-    const d = k.slice(prefix.length);
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) continue;
-    const yy = parseInt(d.slice(0,4),10);
-    const mm = parseInt(d.slice(5,7),10)-1;
-    if(yy !== y || mm !== m) continue;
-    const val = (localStorage.getItem(k) || "").trim();
-    if(!val) continue;
-    entries.push({date:d, text:val});
-  }
-  entries.sort((a,b)=>a.date.localeCompare(b.date));
-
-  if(entries.length === 0){
-    host.innerHTML = "<div class='empty'></div>";
-    return;
-  }
-
-  const monthLabel = document.querySelector(".monthLabel")?.textContent?.trim() || "";
-  host.innerHTML = "<h2>Journal entries — " + monthLabel + "</h2>" +
-    entries.map(e=>{
-      return "<div class='entry'><div class='date'>" + e.date + "</div><div class='text'>" +
-        escapeHtml(e.text) + "</div></div>";
-    }).join("");
-}
-
-function escapeHtml(str){
-  return (str ?? "").replace(/[&<>"']/g, (c) => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
-  }[c]));
-}
-
-function prepareForPrint(){
-  
-  try{ buildPrintMonthJournal(); }catch(e){}
-// Add a class so you can target additional print overrides if needed.
-  document.documentElement.classList.add("is-printing");
-  document.body.classList.add("is-printing");
-
-  // Recompute layout-dependent elements (multiday bars + chart) after print CSS applies.
-  // Use two frames to allow style recalculation before measuring.
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      try{
-        renderMonthGrid();
-        drawYearChart();
-      }catch(e){}
-    });
-  });
-}
-function cleanupAfterPrint(){
-  document.documentElement.classList.remove("is-printing");
-  document.body.classList.remove("is-printing");
-
-  // Restore on-screen layout (bars depend on measurements).
-  requestAnimationFrame(() => {
-    try{
-      renderMonthGrid();
-      drawYearChart();
-    }catch(e){}
-  });
-}
-
+/* Print hooks (kept) */
 printBtn.addEventListener("click", () => {
-  // Trigger re-measure for print and then open the dialog.
-  prepareForPrint();
+  try{ buildPrintMonthJournal(); }catch(e){}
   setTimeout(() => window.print(), 50);
 });
-
-window.addEventListener("beforeprint", prepareForPrint);
-window.addEventListener("afterprint", cleanupAfterPrint);
-
+window.addEventListener("beforeprint", () => { try{ buildPrintMonthJournal(); }catch(e){} });
 
 insIncludeHolidays.addEventListener("change", renderInsights);
 insOverlayJournal.addEventListener("change", renderInsights);
@@ -1344,7 +1149,6 @@ function debounce(fn, ms){
 
 /** ===== Export (CSV) ===== */
 function exportJournalYearCSV(year){
-  // NOTE: journal entries are stored under keys like: journal:v1:YYYY-MM-DD
   const PREFIX = "journal:v1:";
   const rows = [];
 
@@ -1376,7 +1180,6 @@ function exportJournalYearCSV(year){
 
   const lines = ["date,entry"];
   for (const r of rows){
-    // Preserve newlines inside CSV cells. (Excel/Sheets handle quoted newlines.)
     const entry = String(r.text).replace(/\r\n/g, "\n").replace(/\r/g, "\n");
     lines.push(`${csvEscape(r.date)},${csvEscape(entry)}`);
   }
@@ -1492,7 +1295,7 @@ function setActiveMonthTab(){
   [...monthTabsEl.querySelectorAll(".tab")].forEach(t => t.classList.toggle("active", Number(t.dataset.m)===m));
 }
 
-/** ===== Upcoming ===== */
+/** ===== Upcoming (horizontal) ===== */
 function renderUpcoming(){
   const includeHol = holUpcomingToggle.checked;
   const now = new Date();
@@ -1527,6 +1330,72 @@ function renderUpcoming(){
       <div class="badge">${badge}</div>
     `;
     elUpcoming.appendChild(item);
+  }
+}
+
+/** ===== Upcoming Feed (vertical / page 2) ===== */
+function renderUpcomingFeed(){
+  const includeHol = holUpcomingFeedToggle.checked;
+  const now = new Date();
+
+  const merged = [
+    ...primaryEvents,
+    ...(includeHol ? holidayEvents : []),
+  ]
+    .filter(ev => startMs(ev) >= now.getTime())
+    .sort((a,b) => startMs(a)-startMs(b))
+    .slice(0, 120);
+
+  upcomingFeedList.innerHTML = "";
+
+  if (merged.length === 0){
+    upcomingFeedList.innerHTML = `
+      <div class="feedItem">
+        <div class="feedWhen">No upcoming events</div>
+        <div class="feedTitleText">Add events to your calendar</div>
+        <div class="feedMetaRow"><span class="feedBadge">—</span></div>
+      </div>`;
+    return;
+  }
+
+  let lastMonthKey = "";
+  for (const ev of merged){
+    const s = new Date(ev.start);
+    const monthKey = `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,"0")}`;
+    if (monthKey !== lastMonthKey){
+      lastMonthKey = monthKey;
+      const sep = document.createElement("div");
+      sep.className = "feedMonthSep";
+      sep.textContent = s.toLocaleString(undefined, { month:"long", year:"numeric" }).toUpperCase();
+      upcomingFeedList.appendChild(sep);
+    }
+
+    const badge = ev.source === "holiday" ? "Holiday" : (ev.allDay ? "All-day" : "Event");
+
+    const item = document.createElement("div");
+    item.className = "feedItem";
+
+    const evMonth = s.getMonth();
+    item.style.setProperty("--itemAccent", monthColorVar(evMonth));
+
+    item.innerHTML = `
+      <div class="feedWhen">${escapeHtml(fmtUpcomingWhen(ev))}</div>
+      <div class="feedTitleText">${escapeHtml(ev.title)}</div>
+      <div class="feedMetaRow">
+        <span class="feedBadge">${badge}</span>
+        <button class="feedJump" type="button">Jump to day</button>
+      </div>
+    `;
+
+    item.querySelector(".feedJump").addEventListener("click", () => {
+      const dayKey = ymd(clampToDay(new Date(ev.start)));
+      showPage("main");
+      viewMonth = new Date(new Date(ev.start).getFullYear(), new Date(ev.start).getMonth(), 1);
+      render();
+      setTimeout(() => selectDay(dayKey), 0);
+    });
+
+    upcomingFeedList.appendChild(item);
   }
 }
 
@@ -1805,6 +1674,44 @@ function dayMeta(dayYMD){
     if (s < dayEnd && e > dayStart) count++;
   }
   return count === 1 ? "1 event" : `${count} events`;
+}
+
+/* Build print month journal list (kept simple + correct key prefix) */
+function buildPrintMonthJournal(){
+  const host = document.getElementById("printMonthJournal");
+  if(!host) return;
+
+  const y = viewMonth.getFullYear();
+  const m = viewMonth.getMonth(); // 0-based
+
+  const prefix = "journal:v1:";
+  const entries = [];
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(!k || !k.startsWith(prefix)) continue;
+    const d = k.slice(prefix.length);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) continue;
+    const yy = parseInt(d.slice(0,4),10);
+    const mm = parseInt(d.slice(5,7),10)-1;
+    if(yy !== y || mm !== m) continue;
+    const val = (localStorage.getItem(k) || "").trim();
+    if(!val) continue;
+    entries.push({date:d, text:val});
+  }
+  entries.sort((a,b)=>a.date.localeCompare(b.date));
+
+  if(entries.length === 0){
+    host.innerHTML = "<div style='height:0'></div>";
+    return;
+  }
+
+  const monthLabel = document.querySelector(".monthLabel")?.textContent?.trim() || "";
+  host.innerHTML = "<h2 style='margin:10px 0 6px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;'>Journal entries — " + monthLabel + "</h2>" +
+    entries.map(e=>{
+      return "<div style='border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:8px 10px;margin:0 0 8px;white-space:pre-wrap;'>" +
+        "<div style='font-weight:900;margin-bottom:4px;'>" + e.date + "</div>" +
+        "<div>" + escapeHtml(e.text) + "</div></div>";
+    }).join("");
 }
 
 /** ===== INSIGHTS ===== */
